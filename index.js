@@ -1,0 +1,27 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var express = require("express");
+var bodyParser = require("body-parser");
+var cors = require("cors");
+var admin_js_1 = require("./routes/admin.js");
+var komitenti_js_1 = require("./routes/komitenti.js");
+var dogadjaji_js_1 = require("./routes/dogadjaji.js");
+var zadaci_js_1 = require("./routes/zadaci.js");
+var raspored_js_1 = require("./routes/raspored.js");
+var troskovi_js_1 = require("./routes/troskovi.js");
+var prihodi_js_1 = require("./routes/prihodi.js");
+var app = express();
+app.use(bodyParser.json());
+app.use(cors());
+app.use(admin_js_1.default);
+app.use(komitenti_js_1.default);
+app.use(dogadjaji_js_1.default);
+app.use(zadaci_js_1.default);
+app.use(raspored_js_1.default);
+app.use(troskovi_js_1.default);
+app.use(prihodi_js_1.default);
+var port = 3000;
+app.get('/', function (req, res) {
+    res.send('Hello World!');
+});
+app.listen(port, function () { return console.log('listening at port '); });
