@@ -1,8 +1,10 @@
-import database = require("../config/db.js");
-import jwt = require('jsonwebtoken');
-import settings = require("../config/settings.js");
-import bcrypt = require('bcrypt');
-import {IUser} from "../Interface";
+import database from "../../config/db.js";
+import jwt = require("jsonwebtoken");
+import settings = require("../../config/settings.js");
+import bcrypt = require("bcrypt");
+import {IUser} from "../../Interface.js";
+
+
 export function authenticate(request, response, next) {
     const authHeader = request.get("Authorization")
     const token = authHeader.split(" ")[1]

@@ -1,5 +1,5 @@
-import database = require("../config/db.js");
-import {IDogadjaj} from "../Interface";
+import database from "../../config/db.js";
+import {IDogadjaj} from "../../Interface.js";
 
 
 export function getDogadjaji(callback : (rows:IDogadjaj[]) => void)

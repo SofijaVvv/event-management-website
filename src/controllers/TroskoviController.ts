@@ -1,5 +1,5 @@
-import database = require("../config/db.js");
-import {ITroskovi} from "../Interface";
+import database from "../../config/db.js";
+import {ITroskovi} from "../../Interface.js";
 
 export async function addTrosak(noviTrosak:ITroskovi, response) {
     try {

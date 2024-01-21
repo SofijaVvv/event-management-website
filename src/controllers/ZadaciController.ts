@@ -1,5 +1,5 @@
-import database = require("../config/db.js");
-import {IZadatak} from "../Interface";
+import database from "../../config/db.js";
+import {IZadatak} from "../../Interface.js";
 
 
 export function getZadaci( dogadjaj_id: number ,callback : (rows:IZadatak[]) => void)

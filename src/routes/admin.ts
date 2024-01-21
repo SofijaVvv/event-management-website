@@ -1,5 +1,5 @@
 import express = require("express");
-import createUser = require("../controllers/AuthController.js");
+import createUser = require("../controllers/AuthController");
 import {logIn} from "../controllers/AuthController";
 
 

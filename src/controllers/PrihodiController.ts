@@ -1,5 +1,5 @@
-import database = require("../config/db.js");
-import {IPrihodi} from "../Interface";
+import database from "../../config/db.js";
+import {IPrihodi} from "../../Interface.js";
 
 export async function addPrihod(noviPrihod:IPrihodi, response) {
     try {

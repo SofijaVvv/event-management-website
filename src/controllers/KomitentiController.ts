@@ -6,8 +6,8 @@
 // @ts-ignore
 // @ts-ignore
 
-import database = require("../config/db.js");
-import {IKomitent} from "../Interface";
+import database from "../../config/db.js";
+import {IKomitent} from "../../Interface.js";
 
 
 

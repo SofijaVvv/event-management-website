@@ -1,5 +1,5 @@
-import database = require("../config/db.js");
-import {IDogadjaj, IRaspored} from "../Interface";
+import database from "../../config/db.js";
+import {IDogadjaj, IRaspored} from "../../Interface.js";
 
 export async function addRaspored(noviRaspored:IRaspored, response){
     try {

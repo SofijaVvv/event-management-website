@@ -1,13 +1,13 @@
 import express = require('express');
 import bodyParser = require('body-parser');
 import cors = require('cors');
-import adminRouter from './routes/admin.js';
-import komitentiRouter from './routes/komitenti.js';
-import dogadjajiRouter from './routes/dogadjaji.js';
-import zadaciRouter from './routes/zadaci.js';
-import rasporedRouter from './routes/raspored.js';
-import troskoviRouter from './routes/troskovi.js';
-import prihodiRouter from './routes/prihodi.js';
+import adminRouter from './src/routes/admin.js';
+import komitentiRouter from './src/routes/komitenti.js';
+import dogadjajiRouter from './src/routes/dogadjaji.js';
+import zadaciRouter from './src/routes/zadaci.js';
+import rasporedRouter from './src/routes/raspored.js';
+import troskoviRouter from './src/routes/troskovi.js';
+import prihodiRouter from './src/routes/prihodi.js';
 
 
 const app = express();

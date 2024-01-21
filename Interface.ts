@@ -71,6 +71,8 @@ export interface IZadatak {
 
 
 
+
+
 export interface IKomitent {
     id: number;
     naziv: string;
@@ -90,6 +92,8 @@ export interface IKomitent {
  interface AuthedRequest extends Request {
     user: IUser;
 }
+
+
 
 
 export default AuthedRequest
