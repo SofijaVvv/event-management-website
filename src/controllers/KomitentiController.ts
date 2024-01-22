@@ -18,19 +18,6 @@ export function getKomitenti(callback) {
 }
 
 
-// export async function upsertKomitenta(reqBody:IKomitent, response) {
-// try {
-//     const insertedIds = await database("komitent")
-//         .insert(reqBody)
-//         .onConflict("email")
-//         .merge();
-//     const insertedKomitentId = insertedIds[0];
-//     return response.status(200).json(insertedKomitentId);
-// } catch (error) {
-//     console.error('Greška prilikom dodavanja komitenta:', error);
-//     response.status(500).json({ success: false, message: 'Greška prilikom dodavanja komitenta.' });
-// }
-// }
 
 
 export async function addKomitent(noviKomitent:IKomitent, response) {

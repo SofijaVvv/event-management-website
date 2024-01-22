@@ -6,7 +6,7 @@ kljuc: string;
 aktivan: boolean;
 ime: string;
 telefon: string;
-admin: boolean;
+uloge_id: number;
 firma_id: number;
 }
 
@@ -69,7 +69,30 @@ export interface IZadatak {
 
 }
 
+export interface IUloge {
+id: number;
+uloge_naziv: string;
+}
 
+export interface IPrivilegijeUloge {
+    uloge_id: number;
+    privilegije_id: number;
+    aktivan: boolean;
+    uloge_naziv: string;
+    privilegija_naziv: string;
+    app_naziv: string;
+}
+
+export interface IAplikacije {
+   id: number;
+   app_naziv: string;
+
+}
+
+export interface IPrivilegije {
+    id: number;
+    privilegija_naziv: string;
+}
 
 
 
@@ -92,6 +115,8 @@ export interface IKomitent {
  interface AuthedRequest extends Request {
     user: IUser;
 }
+
+
 
 
 
