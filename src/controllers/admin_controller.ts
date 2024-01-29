@@ -1,0 +1,96 @@
+import express = require("express");
+import {authenticate,} from "../middleware/auth_middleware";
+
+import {logIn} from "../services/login_services";
+import {IUser} from "../interfaces/user.js";
+import {IRoles} from "../interfaces/roles.js";
+import {IPrivilages} from "../interfaces/privileges.js";
+import {
+    addRoles,
+    createUser,
+    editRoles,
+    editUser,
+    getPrivilagesRoles,
+    getRoles,
+    getUsers
+} from "../services/admin_services";
+
+
+const adminrouter = express.Router()
+
+adminrouter.get("/user/list", authenticate, async (request, response) => {
+    await getUsers().then(rezultat => {
+        response.json(rezultat)
+    })
+
+});
+
+adminrouter.post("/user/create", authenticate, async (request, response) => {
+    const podaciOperatera: IUser = request.body;
+    await createUser(podaciOperatera).then(result => {
+        console.log(result,"new_user_result")
+        response.json(result)
+    })
+});
+
+
+adminrouter.post("/login", async (request, response) => {
+    const podaciOperatera: IUser = request.body;
+    await logIn(podaciOperatera).then(result => {
+        console.log(result,"login_result")
+        response.json(result)
+    });
+
+});
+
+
+adminrouter.post("/user/edit", authenticate, async (request, response) => {
+    const podaciOperatera: IUser = request.body;
+    await editUser(podaciOperatera).then(result => {
+        console.log(result,"edit_user_result")
+        response.json(result)
+    });
+});
+
+
+///////////////////////ULOGE////////////////////////
+
+adminrouter.post("/roles/add", authenticate, async (request, response) => {
+    const podaciUloge:IRoles = request.body;
+    await addRoles(podaciUloge).then(result => {
+        console.log(result,"new_role_result")
+        response.json(result)
+    });
+});
+
+adminrouter.get("/roles", authenticate, async (request, response) => {
+    await getRoles().then(rezultat => {
+        response.json(rezultat)
+    })
+});
+
+adminrouter.get("/roles_privileges/:uloge_id", authenticate, async (request, response) => {
+    const uloge_id: number = parseInt(request.params.uloge_id);
+    await getPrivilagesRoles(uloge_id).then(rezultat => {
+        response.json(rezultat)
+    })
+});
+
+adminrouter.post("/roles/edit", authenticate, async (request, response) => {
+    const podaciUloge:IRoles = request.body;
+    await editRoles(podaciUloge).then(result => {
+        console.log(result,"edit_role_result")
+        response.json(result)
+    });
+
+});
+
+// /////////////////////PRIVILEGIJE////////////////////////
+// adminrouter.post("/privilegije/assign", authenticate, async (request, response) => {
+//     const privilegije: IPrivilegije = request.body;
+//     await addPrivilegije(privilegije, response);
+//     console.log(privilegije);
+//
+// });
+
+export default adminrouter;

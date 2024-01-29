@@ -1,8 +1,8 @@
-import database from "../../config/db.js";
-import {IDogadjaj} from "../../Interface.js";
+import database from "../repository /db.js";
+import {IEvents} from "../interfaces/events.js";
 
 
-export function getDogadjaji(callback : (rows:IDogadjaj[]) => void)
+export function getEvent(callback : (rows:IEvents[]) => void)
 {
     database('dogadjaji').select().orderBy([{ column : "datum",order: "desc"}]).then((rows) => {
         callback(rows);
@@ -11,7 +11,7 @@ export function getDogadjaji(callback : (rows:IDogadjaj[]) => void)
 
 }
 
-export async function addDogadjaj(noviDogadjaj:IDogadjaj, response) {
+export async function addEvent(noviDogadjaj:IEvents, response) {
     try {
         const tmp = noviDogadjaj.datum.split(".");
         noviDogadjaj.datum = tmp[2]+"-"+tmp[1]+"-"+tmp[0];
@@ -28,7 +28,7 @@ export async function addDogadjaj(noviDogadjaj:IDogadjaj, response) {
     }
 }
 
-export async function editDogadjaj(updatePodaciDogadjaja:IDogadjaj, response) {
+export async function editEvent(updatePodaciDogadjaja:IEvents, response) {
     try {
         const tmp = updatePodaciDogadjaja.datum.split(".");
         updatePodaciDogadjaja.datum = tmp[2]+"-"+tmp[1]+"-"+tmp[0];

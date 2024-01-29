@@ -1,8 +1,8 @@
-import database from "../../config/db.js";
-import {IZadatak} from "../../Interface.js";
+import database from "../repository /db.js";
+import {IAssignments} from "../interfaces/assignments.js";
 
 
-export function getZadaci( dogadjaj_id: number ,callback : (rows:IZadatak[]) => void)
+export function getAssignments( dogadjaj_id: number ,callback : (rows:IAssignments[]) => void)
 {
 
     database('dogadjaji_zadaci').select().where({dogadjaj_id: dogadjaj_id})
@@ -14,7 +14,7 @@ export function getZadaci( dogadjaj_id: number ,callback : (rows:IZadatak[]) => 
 
 }
 
-export async function addZadatak(noviZadatak:IZadatak, response) {
+export async function addAssignments(noviZadatak:IAssignments, response) {
     try {
         const tmp = noviZadatak.datum_kreiranja.split(".");
         noviZadatak.datum_kreiranja = tmp[2]+"-"+tmp[1]+"-"+tmp[0];
@@ -31,7 +31,7 @@ export async function addZadatak(noviZadatak:IZadatak, response) {
     }
 }
 
-export async function editZadatak(updatePodaciZadatka:IZadatak, response) {
+export async function editAssignments(updatePodaciZadatka:IAssignments, response) {
     try {
         const tmp = updatePodaciZadatka.datum_kreiranja.split(".");
         updatePodaciZadatka.datum_kreiranja = tmp[2]+"-"+tmp[1]+"-"+tmp[0];

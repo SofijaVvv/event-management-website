@@ -1,7 +1,7 @@
-import database from "../../config/db.js";
-import {ITroskovi} from "../../Interface.js";
+import database from "../repository /db.js";
+import {ICosts} from "../interfaces/costs.js";
 
-export async function addTrosak(noviTrosak:ITroskovi, response) {
+export async function addCost(noviTrosak:ICosts, response) {
     try {
         const insertedIds = await database("dogadjaj_troskovi")
             .insert(noviTrosak);
@@ -16,7 +16,7 @@ export async function addTrosak(noviTrosak:ITroskovi, response) {
 }
 
 
-export async function editTrosak(updatePodaciTroska:ITroskovi, response) {
+export async function editCost(updatePodaciTroska:ICosts, response) {
     try {
         const dogadjaj = await database("dogadjaj_troskovi")
             .where("id", updatePodaciTroska.id)

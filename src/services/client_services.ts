@@ -6,12 +6,12 @@
 // @ts-ignore
 // @ts-ignore
 
-import database from "../../config/db.js";
-import {IKomitent} from "../../Interface.js";
+import database from "../repository /db.js";
+import {IClient} from "../interfaces/client.js";
 
 
 
-export function getKomitenti(callback) {
+export function getClient(callback) {
     database('komitent').select().orderBy([{ column : "naziv",order: "asc"}]).then((rows) => {
         callback(rows);
     })
@@ -20,7 +20,7 @@ export function getKomitenti(callback) {
 
 
 
-export async function addKomitent(noviKomitent:IKomitent, response) {
+export async function addClient(noviKomitent:IClient, response) {
     try {
         const insertedIds = await database("komitent")
             .insert(noviKomitent);
@@ -32,7 +32,7 @@ export async function addKomitent(noviKomitent:IKomitent, response) {
     }
 }
 
-export async function editKomitent(updatePodaciKomitenta:IKomitent, response) {
+export async function editClient(updatePodaciKomitenta:IClient, response) {
     try {
         const komitent = await database("komitent")
             .where("id", updatePodaciKomitenta.id)

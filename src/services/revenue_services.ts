@@ -1,7 +1,7 @@
-import database from "../../config/db.js";
-import {IPrihodi} from "../../Interface.js";
+import database from "../repository /db.js";
+import {IRevenues} from "../interfaces/revenues.js";
 
-export async function addPrihod(noviPrihod:IPrihodi, response) {
+export async function addRevenue(noviPrihod:IRevenues, response) {
     try {
         const tmp = noviPrihod.rok_placanja.split(".");
         noviPrihod.rok_placanja = tmp[2]+"-"+tmp[1]+"-"+tmp[0];
@@ -18,7 +18,7 @@ export async function addPrihod(noviPrihod:IPrihodi, response) {
     }
 }
 
-export async function editPrihod(updatePodaciPrihoda:IPrihodi, response) {
+export async function editRevenue(updatePodaciPrihoda:IRevenues, response) {
     try {
         const tmp = updatePodaciPrihoda.rok_placanja.split(".");
         updatePodaciPrihoda.rok_placanja = tmp[2] + "-" + tmp[1] + "-" + tmp[0];
