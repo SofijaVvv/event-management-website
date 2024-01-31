@@ -4,12 +4,13 @@ import {authenticate} from "../middleware/auth_middleware";
 import { editClient, getClient} from "../services/client_services";
 const clientrouter = express.Router()
 import {addClient} from "../services/client_services";
-import komitenti from "./client_controller";
-
-clientrouter.get("/client", authenticate, (request, response) => {
+import {IClient} from "../interfaces/client";
 
 
-    getClient(rezultat => {
+clientrouter.get("/client", authenticate, (_request, response) => {
+
+
+    getClient((rezultat:IClient) => {
         response.json(rezultat)
 
     });

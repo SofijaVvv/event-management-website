@@ -4,7 +4,7 @@ import {addEvent, editEvent, getEvent} from "../services/event_services";
 
 const eventrouter = express.Router()
 
-eventrouter.get("/events", authenticate, (request, response) => {
+eventrouter.get("/events", authenticate, (_request, response) => {
     getEvent(rezultat => {
         response.json(rezultat)
     })

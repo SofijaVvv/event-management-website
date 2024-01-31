@@ -4,8 +4,9 @@ import {authenticate,} from "../middleware/auth_middleware";
 import {logIn} from "../services/login_services";
 import {IUser} from "../interfaces/user.js";
 import {IRoles} from "../interfaces/roles.js";
-import {IPrivilages} from "../interfaces/privileges.js";
+
 import {
+    addPrivileges,
     addRoles,
     createUser,
     editRoles,
@@ -14,11 +15,12 @@ import {
     getRoles,
     getUsers
 } from "../services/admin_services";
+import {IPrivilages} from "../interfaces/privileges";
 
 
 const adminrouter = express.Router()
 
-adminrouter.get("/user/list", authenticate, async (request, response) => {
+adminrouter.get("/user/list", authenticate, async (_request, response) => {
     await getUsers().then(rezultat => {
         response.json(rezultat)
     })
@@ -63,14 +65,14 @@ adminrouter.post("/roles/add", authenticate, async (request, response) => {
     });
 });
 
-adminrouter.get("/roles", authenticate, async (request, response) => {
+adminrouter.get("/roles", authenticate, async (_request, response) => {
     await getRoles().then(rezultat => {
         response.json(rezultat)
     })
 });
 
-adminrouter.get("/roles_privileges/:uloge_id", authenticate, async (request, response) => {
-    const uloge_id: number = parseInt(request.params.uloge_id);
+adminrouter.get("/roles_privileges/:roles_id", authenticate, async (request, response) => {
+    const uloge_id: number = parseInt(request.params.roles_id);
     await getPrivilagesRoles(uloge_id).then(rezultat => {
         response.json(rezultat)
     })
@@ -87,10 +89,14 @@ adminrouter.post("/roles/edit", authenticate, async (request, response) => {
 
 // /////////////////////PRIVILEGIJE////////////////////////
 // adminrouter.post("/privilegije/assign", authenticate, async (request, response) => {
-//     const privilegije: IPrivilegije = request.body;
-//     await addPrivilegije(privilegije, response);
+//     const privilegije: IPrivilages = request.body;
+//     await addPrivileges();
 //     console.log(privilegije);
 //
 // });
+
+
+
+
 
 export default adminrouter;

@@ -5,7 +5,63 @@ import {IRoles} from "../interfaces/roles";
 import {IApplication} from "../interfaces/app";
 import {IPrivilages} from "../interfaces/privileges";
 import {IPrivilegesRoles} from "../interfaces/privilages_roles";
-import { Response } from "express-serve-static-core";
+import sendMail from './mail_service';
+function generatePassword(length: number, minLowercase: number, minUppercase: number, minDigits: number, minSymbols: number): string {
+
+    const lowercaseChars = 'abcdefghijklmnopqrstuvwxyz';
+    const uppercaseChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const digitChars = '0123456789';
+    const symbolChars = '!@#$%^&*()-_=+[]{}<>,.?/';
+
+    let password = '';
+
+    // Ensure minimum lowercase
+    for(let i=0; i<minLowercase; i++) {
+        password += lowercaseChars.charAt(Math.floor(Math.random() * lowercaseChars.length));
+    }
+
+    // Ensure minimum uppercase
+    for(let i=0; i<minUppercase; i++) {
+        password += uppercaseChars.charAt(Math.floor(Math.random() * uppercaseChars.length));
+    }
+
+    // Ensure minimum digits
+    for(let i=0; i<minDigits; i++) {
+        password += digitChars.charAt(Math.floor(Math.random() * digitChars.length));
+    }
+
+    // Ensure minimum symbols
+    for(let i=0; i<minSymbols; i++) {
+        password += symbolChars.charAt(Math.floor(Math.random() * symbolChars.length));
+    }
+
+    // Generate remaining characters
+    const remainingLength = length - minLowercase - minUppercase - minDigits - minSymbols;
+    for(let i=0; i<remainingLength; i++) {
+        const charSet = lowercaseChars + uppercaseChars + digitChars + symbolChars;
+        password += charSet.charAt(Math.floor(Math.random() * charSet.length));
+    }
+
+    // Shuffle the password
+    password = shuffleString(password);
+
+    return password;
+
+}
+
+// Fisher-Yates shuffle
+function shuffleString(str: string): string {
+    let arr = str.split('');
+    for(let i=arr.length-1; i>0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr.join('');
+}
+
+
+
+
 
 export async function createUser(userInfo: IUser){
     console.log(userInfo,"reqBody")
@@ -15,11 +71,26 @@ export async function createUser(userInfo: IUser){
     if (retrievedUser) {
         return {error: true, message: "User already exists!"};
     }
-    const hashed_password = await bcrypt.hash(userInfo.password, 12)
+    // TODO kod za geberisanje oassworda
+
+   const generated_password  = generatePassword(12, 2, 2, 1, 1);
+console.log('generisan password', userInfo.password)
+    const hashed_password = await bcrypt.hash(generated_password, 12)
             try {
                 userInfo.password = hashed_password;
                 const insertedIds = await database("user")
                     .insert(userInfo);
+                // TODO slanje maila sa passwordom
+                let email_subject = "Your password for the Application Dogadjaji"
+                let email_body = `Your credentials for the Application Dogadjaji are: \n email: ${userInfo.email} \n password: ${generated_password} \n Please change your password after first login! \n Thank you! \n`
+                  await sendMail(userInfo.email, email_subject,email_body)
+                    .then(r => {
+                        if (r.error){
+                            return {error: true, message: " Client inserted but mail is not sent!"};
+                        }
+                        console.log("povratno", r);
+                    });
+
                 return {error: false, message: insertedIds[0]};
             } catch (error_1) {
                 return {error: true, message: error_1.message};
@@ -47,7 +118,7 @@ export async function editUser(updateUser:IUser){
         .where("id", updateUser.id)
         .update(updateUser);
 
-    return ({ error: true, message: 'User updated!' });
+    return ({ error: false, message: 'User updated!' });
 
 }
 
@@ -55,8 +126,9 @@ export async function editUser(updateUser:IUser){
 
 
 export async function getRoles():Promise<IRoles[]>{
-    return database('roles').select().orderBy([{ column : "uloge_naziv",order: "asc"}]).then((rows) => {
-        return (rows);
+    return database('roles').select().orderBy([{ column : "name",order: "asc"}])
+        .then((rows:IRoles[]) => {
+            return (rows);
     })
 }
 
@@ -86,7 +158,6 @@ export async function editRoles(updateRole:IRoles, ){
     } catch (error) {
         console.error('Error changing role:', error);
         return ({error: true, message: 'Error changing role'});
-
     }
 }
 
@@ -117,13 +188,13 @@ export async function addPrivileges(role_id: number) {
 
 
 async function getApplication(): Promise<IApplication[]>{
-    return database('app').select().orderBy([{column: "app_name", order: "asc"}]).then((rows) => {
+    return database('app').select().orderBy([{column: "app_name", order: "asc"}]).then((rows:IApplication) => {
         return (rows);
     })
 }
 
 async function getPrivilages(): Promise<IPrivilages[]>{
-    return database('privileges').select().orderBy([{column: "privileges_name", order: "asc"}]).then((rows) => {
+    return database('privileges').select().orderBy([{column: "privileges_name", order: "asc"}]).then((rows:IPrivilages) => {
         return (rows);
     })
 }
@@ -134,7 +205,7 @@ export async function getPrivilagesRoles(roles_id: number): Promise<IPrivilegesR
         .join('privileges as p', 'up.privileges_id', '=', 'p.id')
         .join('app as a', 'up.app_id', '=', 'a.id')
         .where('u.id', '=', roles_id)
-        .select('u.roles_name', 'p.privileges_name', 'a.app_name', 'u.id as uid', 'p.id as pid', 'a.id as aid', 'up.activity')
+        .select('u.name', 'p.privileges_name', 'a.app_name', 'u.id as uid', 'p.id as pid', 'a.id as aid', 'up.activity')
         .orderBy(['a.app_name', 'p.privileges_name']).then((rows) => {
             const grouped = rows.reduce((acc, cur) => {
                 if (!acc[cur.app_name]) {
