@@ -8,14 +8,15 @@ import {IRoles} from "../interfaces/roles.js";
 import {
     addPrivileges,
     addRoles,
-    createUser,
+    createUser, editPrivileges,
     editRoles,
     editUser,
     getPrivilagesRoles,
     getRoles,
     getUsers
 } from "../services/admin_services";
-import {IPrivilages} from "../interfaces/privileges";
+import {IPrivileges} from "../interfaces/privileges";
+import {IPrivilegesRoles} from "../interfaces/privilages_roles";
 
 
 const adminrouter = express.Router()
@@ -79,8 +80,8 @@ adminrouter.get("/roles_privileges/:roles_id", authenticate, async (request, res
 });
 
 adminrouter.post("/roles/edit", authenticate, async (request, response) => {
-    const podaciUloge:IRoles = request.body;
-    await editRoles(podaciUloge).then(result => {
+    const roleInfo:IRoles = request.body;
+    await editRoles(roleInfo).then(result => {
         console.log(result,"edit_role_result")
         response.json(result)
     });
@@ -88,6 +89,17 @@ adminrouter.post("/roles/edit", authenticate, async (request, response) => {
 });
 
 // /////////////////////PRIVILEGIJE////////////////////////
+
+adminrouter.post("/privileges/edit", authenticate, async (request, response) => {
+    const privilegeInfo: IPrivilegesRoles = request.body;
+    await editPrivileges(privilegeInfo).then(result => {
+        console.log(result,"edit_privileges_result")
+        response.json(result)
+    });
+});
+
+
+
 // adminrouter.post("/privilegije/assign", authenticate, async (request, response) => {
 //     const privilegije: IPrivilages = request.body;
 //     await addPrivileges();

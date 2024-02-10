@@ -3,7 +3,7 @@ import bcrypt = require("bcrypt");
 import {IUser} from "../interfaces/user.js";
 import {IRoles} from "../interfaces/roles";
 import {IApplication} from "../interfaces/app";
-import {IPrivilages} from "../interfaces/privileges";
+import {IPrivileges} from "../interfaces/privileges";
 import {IPrivilegesRoles} from "../interfaces/privilages_roles";
 import sendMail from './mail_service';
 function generatePassword(length: number, minLowercase: number, minUppercase: number, minDigits: number, minSymbols: number): string {
@@ -71,7 +71,7 @@ export async function createUser(userInfo: IUser){
     if (retrievedUser) {
         return {error: true, message: "User already exists!"};
     }
-    // TODO kod za geberisanje oassworda
+
 
    const generated_password  = generatePassword(12, 2, 2, 1, 1);
 console.log('generisan password', userInfo.password)
@@ -80,7 +80,7 @@ console.log('generisan password', userInfo.password)
                 userInfo.password = hashed_password;
                 const insertedIds = await database("user")
                     .insert(userInfo);
-                // TODO slanje maila sa passwordom
+
                 let email_subject = "Your password for the Application Dogadjaji"
                 let email_body = `Your credentials for the Application Dogadjaji are: \n email: ${userInfo.email} \n password: ${generated_password} \n Please change your password after first login! \n Thank you! \n`
                   await sendMail(userInfo.email, email_subject,email_body)
@@ -166,7 +166,7 @@ export async function editRoles(updateRole:IRoles, ){
 
 export async function addPrivileges(role_id: number) {
     const applications = await getApplication() as IApplication[];
-    const privileges = await getPrivilages() as IPrivilages[];
+    const privileges = await getPrivilages() as IPrivileges[];
 
     for (let i = 0; i < applications.length; i++) {
         const app = applications[i];
@@ -193,10 +193,28 @@ async function getApplication(): Promise<IApplication[]>{
     })
 }
 
-async function getPrivilages(): Promise<IPrivilages[]>{
-    return database('privileges').select().orderBy([{column: "privileges_name", order: "asc"}]).then((rows:IPrivilages) => {
+async function getPrivilages(): Promise<IPrivileges[]>{
+    return database('privileges').select().orderBy([{column: "privileges_name", order: "asc"}]).then((rows:IPrivileges) => {
         return (rows);
     })
+}
+
+export async function editPrivileges(updatePrivilege:IPrivilegesRoles){
+   try {
+       console.log(updatePrivilege, "updatePrivilege")
+       await database("roles_privileges")
+           .where("roles_id", '=',  updatePrivilege.roles_id)
+           .andWhere(  "privileges_id",'=', updatePrivilege.privileges_id)
+           .andWhere("app_id", '=', updatePrivilege.app_id)
+           .update(updatePrivilege);
+
+       return ({ error: false, message: 'Privilege is updated' });
+
+   } catch (error) {
+       console.error('Error changing privileges:', error);
+       return ({error: true, message: 'Error changing privileges'});
+   }
+
 }
 
 export async function getPrivilagesRoles(roles_id: number): Promise<IPrivilegesRoles[]>{
@@ -205,22 +223,30 @@ export async function getPrivilagesRoles(roles_id: number): Promise<IPrivilegesR
         .join('privileges as p', 'up.privileges_id', '=', 'p.id')
         .join('app as a', 'up.app_id', '=', 'a.id')
         .where('u.id', '=', roles_id)
-        .select('u.name', 'p.privileges_name', 'a.app_name', 'u.id as uid', 'p.id as pid', 'a.id as aid', 'up.activity')
-        .orderBy(['a.app_name', 'p.privileges_name']).then((rows) => {
+        .select('u.name', 'p.privileges_name', 'a.app_name', 'a.app_route', 'u.id as roles_id', 'p.id as privileges_id', 'a.id as app_id', 'up.activity')
+        .orderBy(['a.app_name','p.privileges_name'])
+        .then((rows) => {
             const grouped = rows.reduce((acc, cur) => {
-                if (!acc[cur.app_name]) {
-                    acc[cur.app_name] = [];
+                const appName = cur.app_name;
+                const appRoute = cur.app_route;
+                if (!acc[appName] && acc) {
+                    acc[appName] = {route: appRoute, value: []};
                 }
-                acc[cur.app_name].push({
+                acc[appName].value.push({
                     privileges_name: cur.privileges_name,
-                    uid: cur.uid,
-                    pid: cur.pid,
-                    aid: cur.aid,
+                    roles_id: cur.roles_id,
+                    privileges_id: cur.privileges_id,
+                    app_id: cur.app_id,
                     activity: cur.activity
                 });
 
                 return acc;
             }, {});
-            return (grouped);
+            const result = [];
+            for (const key in grouped){
+                result.push({key, route: grouped[key].route, value: grouped[key].value});
+            }
+
+            return (result);
         })
 }

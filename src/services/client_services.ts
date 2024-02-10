@@ -12,7 +12,7 @@ import {IClient} from "../interfaces/client.js";
 
 
 export function getClient(callback) {
-    database('komitent').select().orderBy([{ column : "naziv",order: "asc"}]).then((rows) => {
+    database('client').select().orderBy([{ column : "name",order: "asc"}]).then((rows) => {
         callback(rows);
     })
 }

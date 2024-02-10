@@ -4,6 +4,7 @@ import bcrypt = require("bcrypt");
 import jwt = require("jsonwebtoken");
 import settings = require("../middleware/settings");
 import {response} from "express";
+import {getPrivilagesRoles} from "./admin_services";
 
 
 
@@ -19,7 +20,15 @@ async function signToken(payload) {
     });
 }
 
-
+async function getAdmin(roleId:number){
+    const data =  await database('roles').select().where('id',roleId).first();
+    if (data){
+        if (data.name === "admin"){
+            return true;
+        }
+    }
+    return false;
+}
 
 export async function logIn(podaciOperatera:IUser){
     try {
@@ -33,11 +42,22 @@ export async function logIn(podaciOperatera:IUser){
         if (!areSamePasswords) {
             return ({ error: true, message: "Invalid username or password!" });
         }
+        const privileges = await getPrivilagesRoles(retrievedUser.roles_id);
+
+
         const payload = { email: retrievedUser.email };
         const token = await signToken(payload);
         try {
             const result = await signToken(payload);
-            return ({ error: false, token: result });
+            const userData = {
+                id: retrievedUser.id,
+                email: retrievedUser.email,
+                name: retrievedUser.name,
+                isadmin: await getAdmin(retrievedUser.roles_id)
+            }
+
+
+            return ({ error: false, token: result, privileges: privileges, userdata: userData });
         } catch (error) {
             return ({ error: true, message: error.message });
         }

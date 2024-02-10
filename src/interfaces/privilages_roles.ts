@@ -4,5 +4,6 @@ export interface IPrivilegesRoles {
     activity: boolean;
     roles_name: string;
     privileges_name: string;
-    app_name: string;
+     app_id: number;
+
 }
