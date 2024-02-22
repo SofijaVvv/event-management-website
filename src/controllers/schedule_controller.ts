@@ -1,19 +1,28 @@
 import express = require('express');
 import { authenticate } from '../middleware/auth_middleware';
-import {addSchedule,editSchedule} from '../services/schedule_services';
+import {addSchedule, getSchedules} from '../services/schedule_services';
+import {addAssignment} from "../services/assignment_services";
 
 const schedulerouter = express.Router();
 
-schedulerouter.post('/schedule/add', authenticate, async (request, response) => {
-    const podaciRasporeda = request.body;
-    await addSchedule(podaciRasporeda, response);
-    console.log(podaciRasporeda);
-});
 
-schedulerouter.post('/schedule/edit', authenticate, async (request, response) => {
-    const podaciRasporeda = request.body;
-    await editSchedule(podaciRasporeda, response);
-    console.log(podaciRasporeda);
+
+
+schedulerouter.get("/schedule/list/:event_id", authenticate, async (request, response) => {
+    const eventId: number = parseInt(request.params.event_id);
+
+    await getSchedules(eventId).then(rezultat => {
+        response.json(rezultat)
+    });
+});
+schedulerouter.post("/schedule/add", authenticate, async (request, response) => {
+    const scheduleData = request.body;
+    scheduleData.user.id = request.user.id;
+    await addSchedule(scheduleData).then(rezultat => {
+        response.json(rezultat)
+    });
+    console.log(scheduleData);
+
 });
 
 export default schedulerouter;

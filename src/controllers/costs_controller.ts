@@ -1,20 +1,28 @@
 import express = require("express");
 import {authenticate} from "../middleware/auth_middleware";
-import {addCost, editCost} from "../services/costs_services";
+import {addCost, getCosts} from "../services/costs_services";
 
 const costsrouter = express.Router()
 
-costsrouter.post("/costs/add", authenticate, async (req, res) => {
-    const podaciTroska = req.body;
-    await addCost(podaciTroska, res);
-    console.log(podaciTroska);
+
+costsrouter.get("/cost/list/:event_id", authenticate, async (request, response) => {
+    const eventId: number = parseInt(request.params.event_id);
+    await getCosts(eventId).then(rezultat => {
+        response.json(rezultat)
+    });
 });
 
-costsrouter.post("/costs/edit", authenticate, async (req, res) => {
-    const podaciTroska = req.body;
-    await editCost(podaciTroska, res);
-    console.log(podaciTroska);
+costsrouter.post("/cost/add", authenticate, async (request, response) => {
+    const costData = request.body;
+    costData.user.id = request.user.id;
+    await addCost(costData).then(rezultat => {
+        response.json(rezultat)
+    });
+    console.log(costData);
+
 });
+
+
 
 
 

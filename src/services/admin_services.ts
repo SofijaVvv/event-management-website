@@ -97,6 +97,45 @@ console.log('generisan password', userInfo.password)
             }
 }
 
+
+
+export async function resetPassword(userEmail: { email : "" }){
+    console.log(userEmail.email,"reqBody")
+    const retrievedUser = await database('user')
+        .where('email', userEmail.email)
+        .select('*').first()
+    if (!retrievedUser) {
+        return {error: true, message: "User does not exists!"};
+    }
+
+
+    const generated_password  = generatePassword(12, 2, 2, 1, 1);
+    console.log('generisan password', userEmail.email)
+    const hashed_password = await bcrypt.hash(generated_password, 12)
+    try {
+        const newPassword= {
+            password : hashed_password
+        };
+        const insertedIds = await database("user").where('id', retrievedUser.id)
+            .update(newPassword)
+
+        let email_subject = "Password reset for the Application Dogadjaji"
+        let email_body = `Your credentials for the Application Dogadjaji are: \n email: ${userEmail.email} \n password: ${generated_password} \n  Thank you! \n`
+        await sendMail(userEmail.email, email_subject,email_body)
+            .then(r => {
+                if (r.error){
+                    return {error: true, message: " Client inserted but mail is not sent!"};
+                }
+                console.log("povratno", r);
+            });
+
+        return {error: false, message: "Password reseted"};
+    } catch (error_1) {
+        return {error: true, message: error_1.message};
+    }
+}
+
+
 ///////////////////////////////////USER///////////////////////////////////////
 
 export async function getUsers():Promise<IUser[]>{

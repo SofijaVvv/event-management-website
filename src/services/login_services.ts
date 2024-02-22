@@ -5,16 +5,16 @@ import jwt = require("jsonwebtoken");
 import settings = require("../middleware/settings");
 import {response} from "express";
 import {getPrivilagesRoles} from "./admin_services";
-
+import {TOKEN_EXPIRES_IN} from "../middleware/settings";
 
 
 async function signToken(payload) {
     return new Promise((resolve, reject) => {
-        jwt.sign(payload, settings.SECRET_KEY, async (error, token) => {
+        jwt.sign(payload, settings.SECRET_KEY, {expiresIn: TOKEN_EXPIRES_IN}, async (error, token) => {
+
             if (error) {
                 reject (error);
             }
-
             resolve (token);
         });
     });
@@ -46,6 +46,7 @@ export async function logIn(podaciOperatera:IUser){
 
 
         const payload = { email: retrievedUser.email };
+
         const token = await signToken(payload);
         try {
             const result = await signToken(payload);
@@ -56,7 +57,6 @@ export async function logIn(podaciOperatera:IUser){
                 isadmin: await getAdmin(retrievedUser.roles_id)
             }
 
-
             return ({ error: false, token: result, privileges: privileges, userdata: userData });
         } catch (error) {
             return ({ error: true, message: error.message });
@@ -65,3 +65,9 @@ export async function logIn(podaciOperatera:IUser){
        return ({ error: true, message: error.message });
     }
 }
+
+
+
+
+
+

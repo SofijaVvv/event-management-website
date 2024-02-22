@@ -1,14 +1,17 @@
+import {Details} from "./events";
+
 export interface IClient {
     id: number;
-    naziv: string;
+    name: string;
+    address: string;
+    city: string;
+    phone: string;
+    pdvnumber: string;
     pib: string;
-    pdvbroj: string;
-    adresa: string;
-    telefon: string;
     email: string;
-    ziroracun: string;
-    drzava: number;
-    grad: string;
-    napomena: string;
-    vrsta_komitenta: number;
+    type_of_client: Details;
+    bank_account: string;
+    note: string;
+
+
 }

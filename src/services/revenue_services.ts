@@ -1,38 +1,82 @@
 import database from "../repository /db.js";
-import {IRevenues} from "../interfaces/revenues.js";
+import {ScheduleDetails} from "../interfaces/schedule";
+import {RevenuesDetails} from "../interfaces/revenues";
 
-export async function addRevenue(noviPrihod:IRevenues, response) {
-    try {
-        const tmp = noviPrihod.rok_placanja.split(".");
-        noviPrihod.rok_placanja = tmp[2]+"-"+tmp[1]+"-"+tmp[0];
 
-        const insertedIds = await database("prihodi")
-            .insert(noviPrihod);
+export async function getRevenues( event_id: number = 0 )
+{
+    let query = database('revenues as rev')
+        .join('user', 'rev.user_id', '=', 'user.id')
+        .join('type_of_revenues as tor', 'rev.type_of_revenues_id', '=', 'tor.id')
+        .join('units as u', 'rev.unit_id', '=', 'u.id')
+        .select(
+            'rev.id',
+            'rev.type_of_revenues_id',
+            'rev.events_id',
+            'rev.user_id',
+            'user.name as user_name',
+            'rev.amount',
+            'rev.description',
+            'rev.quantity',
+            'rev.unit_id',
+            'u.name as unit_name',
+            'tor.name as type_of_revenue_name'
 
-        noviPrihod.id= insertedIds[0];
-        response.json(noviPrihod);
+        ).orderBy([{ column : "id",order: "desc"}])
 
-    } catch (error) {
-        console.error('Greška prilikom dodavanja prihoda:', error);
-        response.status(500).json({ success: false, message: 'Greška prilikom dodavanja prihoda.' });
+    if (event_id) {
+        query = query.where('rev.events_id', event_id);
     }
+    return query.then(rows => {
+
+        const result: RevenuesDetails[] = [];
+        for (let i = 0; i < rows.length; i++) {
+            const revenue: RevenuesDetails = {
+                id: rows[i].id,
+                description: rows[i].description,
+                user: {
+                    id: rows[i].user_id,
+                    name: rows[i].user_name
+                },
+                event_id: rows[i].events_id,
+                amount: rows[i].amount,
+                type_of_revenue: {
+                    id: rows[i].type_of_revenues_id,
+                    name: rows[i].type_of_revenue_name
+                },
+                quantity: rows[i].quantity,
+                unit: {
+                    id: rows[i].unit_id,
+                    name: rows[i].unit_name
+                },
+            }
+
+            result.push(revenue);
+        }
+        return result;
+    });
+
 }
 
-export async function editRevenue(updatePodaciPrihoda:IRevenues, response) {
-    try {
-        const tmp = updatePodaciPrihoda.rok_placanja.split(".");
-        updatePodaciPrihoda.rok_placanja = tmp[2] + "-" + tmp[1] + "-" + tmp[0];
-
-        const dogadjaj = await database("prihodi")
-            .where("id", updatePodaciPrihoda.id)
-            .update(updatePodaciPrihoda);
-
-        response.status(200).json({success: true, message: 'Prihod je izmijenjen.'});
-
-    } catch (error) {
-        console.error('Greška prilikom dodavanja prihoda:', error);
-        response.status(500).json({success: false, message: 'Greška prilikom dodavanja prihoda.'});
+export async function addRevenue(newRevenues: RevenuesDetails){
+    const dataForInsert = {
+        user_id: newRevenues.user.id,
+        events_id: newRevenues.event_id,
+        amount: newRevenues.amount,
+        type_of_revenues_id: newRevenues.type_of_revenue.id,
+        quantity: newRevenues.quantity,
+        unit_id: newRevenues.unit.id,
+    }
+    if (newRevenues.id){
+        await database('revenues')
+            .where('id', newRevenues.id)
+            .update(dataForInsert);
+        return ({error:false, message: newRevenues})
+    } else  {
+        const insertedIds = await database('revenues')
+            .insert(dataForInsert);
+        newRevenues.id = insertedIds[0];
+        return ({error:false, message: newRevenues})
     }
 }
-
 

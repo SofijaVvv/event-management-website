@@ -1,36 +1,29 @@
 import express = require("express");
 import {authenticate} from "../middleware/auth_middleware";
 
-import { editClient, getClient} from "../services/client_services";
+import { addClient, getClient} from "../services/client_services";
 const clientrouter = express.Router()
-import {addClient} from "../services/client_services";
-import {IClient} from "../interfaces/client";
 
 
-clientrouter.get("/client", authenticate, (_request, response) => {
+clientrouter.get("/client/:id", authenticate,  async (_request, response) => {
+    const { id } = _request.params;
+    const eventId = parseInt(id.toString());
 
-
-    getClient((rezultat:IClient) => {
+    await getClient(eventId).then(rezultat => {
         response.json(rezultat)
-
     });
 
 });
 
 clientrouter.post("/client/add", authenticate, async (request, response) => {
-    const podaciKomitenta = request.body;
-    await addClient(podaciKomitenta, response);
-    console.log(podaciKomitenta);
+    const clientData = request.body;
+    await addClient(clientData).then(rezultat => {
+        response.json(rezultat)
+    });
 
 });
 
-clientrouter.post("/client/edit", authenticate, async (request, response) => {
-    const podaciKomitenta = request.body;
-    await editClient(podaciKomitenta, response);
-    console.log(podaciKomitenta);
 
-
-});
 
 // komitentirouter.post("/komitenti/add", addKmitent);
 export default clientrouter;

@@ -1,47 +1,188 @@
 import database from "../repository /db.js";
 import {IEvents} from "../interfaces/events.js";
+import {EventDetails} from "../interfaces/events.js";
 
+import * as moment from 'moment';
+export async function getEvents(page: number, limit: number):Promise<IEvents[]> {
 
-export function getEvent(callback : (rows:IEvents[]) => void)
-{
-    database('dogadjaji').select().orderBy([{ column : "datum",order: "desc"}]).then((rows) => {
-        callback(rows);
+    const offset = (page - 1) * limit;
 
-    })
+    return database('events')
+        .select()
+        .orderBy([{ column: 'date', order: 'desc' }])
+        .limit(limit)
+        .offset(offset)
+        .then(rows => {
+            return rows;
+        });
 
 }
 
-export async function addEvent(noviDogadjaj:IEvents, response) {
+
+
+export async function addEvent(newEvent:EventDetails, response) {
     try {
-        const tmp = noviDogadjaj.datum.split(".");
-        noviDogadjaj.datum = tmp[2]+"-"+tmp[1]+"-"+tmp[0];
 
-        const insertedIds = await database("dogadjaji")
-            .insert(noviDogadjaj);
+        const dataForInsert : IEvents = {
+            id: newEvent.id,
+            date: newEvent.date.substring(0, 10),
+            time: newEvent.time.name,
+            client_id: newEvent.client.id,
+            type_of_event_id: newEvent.type_of_event.id,
+            status_event_id: newEvent.status_event.id,
+            location_id: newEvent.location.id,
+            event_rating: newEvent.event_rating,
+            user_id: newEvent.user.id,
+            description: newEvent.description
+        }
 
-        noviDogadjaj.id= insertedIds[0];
-        response.json(noviDogadjaj);
+        if (newEvent.id) {
+            await database("events")
+                .where("id", newEvent.id)
+                .update(dataForInsert);
+            return ({error: false, message: dataForInsert})
+        } else {
+            const insertedIds = await database("events")
+                .insert(dataForInsert);
+            dataForInsert.id= insertedIds[0];
+            return ({error: false, message: dataForInsert})
+        }
 
     } catch (error) {
         console.error('Greška prilikom dodavanja dogadjaja:', error);
-        response.status(500).json({ success: false, message: 'Greška prilikom dodavanja dogadjaja.' });
+        return { error: false, message: 'Error in inserting new event.' }
     }
 }
 
-export async function editEvent(updatePodaciDogadjaja:IEvents, response) {
-    try {
-        const tmp = updatePodaciDogadjaja.datum.split(".");
-        updatePodaciDogadjaja.datum = tmp[2]+"-"+tmp[1]+"-"+tmp[0];
-
-        const dogadjaj = await database("dogadjaji")
-            .where("id", updatePodaciDogadjaja.id)
-            .update(updatePodaciDogadjaja);
-
-        response.status(200).json({ success: true, message: 'Dogadjaj je izmijenjen.' });
 
 
-    } catch (error) {
-        console.error('Greška prilikom izmene dogadjaja:', error);
-        response.status(500).json({success: false, message: 'Greška prilikom izmene dogadjaja.'});
+
+
+
+export async function calendar(year: number, month: number, status = 1) {
+
+
+    const firstDayOfMonth = moment.parseZone(`${year}-${month}-01`);
+
+    let lastDayOfMonth = moment.parseZone(`${year}-${month}-01`).endOf('month');
+
+    const numDays = lastDayOfMonth.date();
+
+
+    const calendar: any[][] = [];
+    for (let i = 0; i < 6; i++) {
+        calendar[i] = [];
+
     }
+
+    const weekday = firstDayOfMonth.day();
+    console.log(weekday, "weekday", firstDayOfMonth.isoWeek())
+    if (weekday > 0) {
+        for (let i = 1; i < weekday; i++) {
+            calendar[0].push({});
+        }
+    } else {
+        for (let i = 0; i < 6; i++) {
+            calendar[0].push({});
+        }
+    }
+    let calRow = 0
+    for (let day = 1; day <= numDays; day++) {
+        const month_ext = month.toString().padStart(2, '0');
+        const day_ext = day.toString().padStart(2, '0');
+
+        const date = moment.parseZone(`${year}-${month_ext}-${day_ext}`);
+
+        const events = await database('events')
+            .where('date', '=', date.format('YYYY-MM-DD'))
+            .andWhere('status_event_id', status);
+
+        if (events.length) {
+            console.log(date,  day,  date.day());
+            calendar[calRow].push({
+                date: day,
+                number_of_events: events.length,
+                weekday: date.day()
+            });
+        } else {
+            calendar[calRow].push({
+                date: day,
+                number_of_events: 0,
+                weekday: date.day()
+            });
+        }
+        if (date.day() === 0) {
+            calRow++;
+        }
+    }
+    calendar.pop();
+    return { calendar };
+}
+
+export async function eventDetails(event_id: number = 0) {
+
+    let query =  database.from('events as e')
+        .join('client as c', 'e.client_id', '=', 'c.id')
+        .join('type_of_events as t', 'e.type_of_event_id', '=', 't.id')
+        .join('event_status as es', 'e.status_event_id', '=', 'es.id')
+        .join('location as l', 'e.location_id', '=', 'l.id')
+        .join('user as u', 'e.user_id', '=', 'u.id')
+        .select(
+            'e.id',
+            'e.client_id',
+            'c.name as client_name',
+            'e.type_of_event_id',
+            't.name as type_of_event_name',
+            'e.status_event_id',
+            'es.name as event_status_name',
+            'e.location_id',
+            'l.name as location_name',
+            'e.user_id',
+            'u.name as user_name',
+            'e.description',
+            'e.date',
+            'e.time',
+            'e.event_rating',
+            )
+        .orderBy('e.date', 'desc')
+        if (event_id) {
+            query = query.where('e.id', event_id);
+        }
+        return query.then(rows => {
+            const result: EventDetails[] = [];
+            for (let i = 0; i < rows.length; i++) {
+                const event: EventDetails = {
+                    id: rows[i].id,
+                    client: {
+                        id: rows[i].client_id,
+                        name: rows[i].client_name
+                    },
+                    type_of_event: {
+                        id: rows[i].type_of_event_id,
+                        name: rows[i].type_of_event_name
+                    },
+                    status_event: {
+                        id: rows[i].status_event_id,
+                        name: rows[i].event_status_name
+                    },
+                    location: {
+                        id: rows[i].location_id,
+                        name: rows[i].location_name
+                    },
+                    user: {
+                        id: rows[i].user_id,
+                        name: rows[i].user_name
+                    },
+                    description: rows[i].description,
+                    date: rows[i].date.toLocaleDateString('sr-Latn', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+                    time: {id: parseInt(rows[i].time.substring(0, 2)), name: rows[i].time},
+                    event_rating: rows[i].event_rating,
+                }
+                if (event_id) {
+                    return  event;
+                }
+                result.push(event);
+            }
+            return result;
+        });
 }

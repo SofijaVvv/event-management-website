@@ -1,12 +1,14 @@
-export interface IAssignments {
+import {Details} from "./events";
+
+
+export interface AssignmentsDetails {
     id: number,
-    opis: string,
+    description: string,
     status: number,
-    prioritet: number,
-    operater_id: number,
-    dogadjaj_id: number,
-    podsjetnik: string,
-    datum_kreiranja: string,
-    datum_zavrsetka: string,
+    priority: Details,
+    user: Details,
+    event_id: number,
+    created_date: Date,
+    end_date: Date,
 
 }
