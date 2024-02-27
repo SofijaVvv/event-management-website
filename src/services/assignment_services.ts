@@ -14,7 +14,7 @@ export async function getPriorities(){
 }
 
 
-export async function getAssignments( event_id: number = 0 )
+export async function getAssignments( event_id: number = 0, fromDate:string, toDate:string )
 {
 
     let query = database('event_assignments as ea')
@@ -30,12 +30,15 @@ export async function getAssignments( event_id: number = 0 )
             'ea.events_id',
             'ea.created_date',
             'ea.end_date',
-            'e.id as event_id'
+            'e.id as event_id',
+            'e.date'
         )
         .orderBy([{ column : "id",order: "desc"}])
 
     if (event_id) {
         query = query.where('e.id', event_id);
+    } else {
+        query = query.whereBetween('e.date', [fromDate, toDate]);
     }
     return query.then(rows => {
         const priortyArray = ["", "Low", "Medium", "High", "Urgent"];
@@ -43,6 +46,7 @@ export async function getAssignments( event_id: number = 0 )
         for (let i = 0; i < rows.length; i++) {
             const assignment: AssignmentsDetails = {
                 id: rows[i].id,
+                date: rows[i].date,
                 description: rows[i].description,
                 status: rows[i].status,
                 priority: {id: rows[i].priority, name: priortyArray[rows[i].priority]},

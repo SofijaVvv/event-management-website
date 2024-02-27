@@ -9,7 +9,7 @@ export function authenticate(request, response, next) {
     const currentMethod = request.method.toLowerCase()
     const currentUrl = request.url.split("/")[1]
 
-    console.log("currentURL", currentUrl)
+    console.log("currentURL", request.url)
 
     const authHeader = request.get("Authorization")
     if (!authHeader) return response.json({error: true, message: "Authorization header is missing"})
@@ -23,7 +23,7 @@ export function authenticate(request, response, next) {
                 console.log(user, "user", payload.email)
                 request.user = {id: user.id, name: user.name, email: user.email, roles_id: user.roles_id}
                 const  authResult =  authorize(user, currentUrl, currentMethod).then((authResult) => {
-                    console.log(authResult, "authResult")
+                    // console.log(authResult, "authResult")
                     if (authResult) {
                         next()
                     } else {

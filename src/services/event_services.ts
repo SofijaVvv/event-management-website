@@ -3,24 +3,8 @@ import {IEvents} from "../interfaces/events.js";
 import {EventDetails} from "../interfaces/events.js";
 
 import * as moment from 'moment';
-export async function getEvents(page: number, limit: number):Promise<IEvents[]> {
 
-    const offset = (page - 1) * limit;
-
-    return database('events')
-        .select()
-        .orderBy([{ column: 'date', order: 'desc' }])
-        .limit(limit)
-        .offset(offset)
-        .then(rows => {
-            return rows;
-        });
-
-}
-
-
-
-export async function addEvent(newEvent:EventDetails, response) {
+export async function addEvent(newEvent:EventDetails) {
     try {
 
         const dataForInsert : IEvents = {
@@ -33,7 +17,8 @@ export async function addEvent(newEvent:EventDetails, response) {
             location_id: newEvent.location.id,
             event_rating: newEvent.event_rating,
             user_id: newEvent.user.id,
-            description: newEvent.description
+            description: newEvent.description,
+            number_of_participants: newEvent.number_of_participants
         }
 
         if (newEvent.id) {
@@ -87,6 +72,7 @@ export async function calendar(year: number, month: number, status = 1) {
         }
     }
     let calRow = 0
+    let lastDay = 0;
     for (let day = 1; day <= numDays; day++) {
         const month_ext = month.toString().padStart(2, '0');
         const day_ext = day.toString().padStart(2, '0');
@@ -114,12 +100,18 @@ export async function calendar(year: number, month: number, status = 1) {
         if (date.day() === 0) {
             calRow++;
         }
+        lastDay = date.day();
+    }
+    if (lastDay < 6) {
+        for (let i = lastDay; i < 6; i++) {
+            calendar[calRow].push({});
+        }
     }
     calendar.pop();
     return { calendar };
 }
 
-export async function eventDetails(event_id: number = 0) {
+export async function eventDetails(event_id: number = 0, fromDate?: string, toDate?: string): Promise<EventDetails> {
 
     let query =  database.from('events as e')
         .join('client as c', 'e.client_id', '=', 'c.id')
@@ -143,10 +135,13 @@ export async function eventDetails(event_id: number = 0) {
             'e.date',
             'e.time',
             'e.event_rating',
+            'e.number_of_participants'
             )
         .orderBy('e.date', 'desc')
         if (event_id) {
             query = query.where('e.id', event_id);
+        } else {
+            query = query.whereBetween('date', [fromDate, toDate]);
         }
         return query.then(rows => {
             const result: EventDetails[] = [];
@@ -177,6 +172,7 @@ export async function eventDetails(event_id: number = 0) {
                     date: rows[i].date.toLocaleDateString('sr-Latn', { day: '2-digit', month: '2-digit', year: 'numeric' }),
                     time: {id: parseInt(rows[i].time.substring(0, 2)), name: rows[i].time},
                     event_rating: rows[i].event_rating,
+                    number_of_participants: rows[i].number_of_participants
                 }
                 if (event_id) {
                     return  event;
@@ -186,3 +182,11 @@ export async function eventDetails(event_id: number = 0) {
             return result;
         });
 }
+
+
+
+
+
+
+
+

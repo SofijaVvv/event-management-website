@@ -8,13 +8,15 @@ const schedulerouter = express.Router();
 
 
 
-schedulerouter.get("/schedule/list/:event_id", authenticate, async (request, response) => {
-    const eventId: number = parseInt(request.params.event_id);
-
-    await getSchedules(eventId).then(rezultat => {
+schedulerouter.get("/schedule/list/:event_id/:fromDate/:toDate", authenticate, async (request, response) => {
+    const {event_id , fromDate, toDate} = request.params;
+    const eventId = parseInt(event_id.toString());
+    await getSchedules(eventId, fromDate, toDate).then(rezultat => {
         response.json(rezultat)
     });
 });
+
+
 schedulerouter.post("/schedule/add", authenticate, async (request, response) => {
     const scheduleData = request.body;
     scheduleData.user.id = request.user.id;

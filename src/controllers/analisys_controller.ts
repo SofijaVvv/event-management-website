@@ -1,14 +1,14 @@
 
 import express = require("express");
 import {authenticate} from "../middleware/auth_middleware";
-import {getAnalisysData} from "../services/analisys_services";
+import {getAnalisysData, numberOfEventsForPeriod} from "../services/analisys_services";
 
 const analisysrouter = express.Router()
 
-analisysrouter.get("/analisys/:fromdate/:todate", authenticate, async (_request, response) => {
+analisysrouter.get("/analisys/:fromDate/:toDate", authenticate, async (_request, response) => {
 
-    const {fromdate, todate} = _request.params;
-    await getAnalisysData(fromdate, todate).then(rezultat => {
+    const {fromDate, toDate} = _request.params;
+    await getAnalisysData(fromDate, toDate).then(rezultat => {
         const dates : string[] = rezultat.message.map((item: any) => item.date);
         const totalRevenues: number[] = rezultat.message.map((item: any) => item.total_revenue);
         const totalCosts: number[] = rezultat.message.map((item: any) => item.total_cost);
@@ -23,6 +23,13 @@ analisysrouter.get("/analisys/:fromdate/:todate", authenticate, async (_request,
 
 }
 );
+
+analisysrouter.get("/analisys/total/:fromDate/:toDate", authenticate, async (_request, response) => {
+    const {fromDate, toDate} = _request.params;
+    await numberOfEventsForPeriod(fromDate, toDate).then(rezultat => {
+        response.json(rezultat)
+    })
+} );
 
 
 export default analisysrouter;

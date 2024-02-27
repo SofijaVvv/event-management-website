@@ -10,5 +10,6 @@ export interface AssignmentsDetails {
     event_id: number,
     created_date: Date,
     end_date: Date,
+    date: string
 
 }

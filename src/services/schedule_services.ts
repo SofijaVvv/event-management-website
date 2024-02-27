@@ -1,11 +1,12 @@
 import database from "../repository /db.js";
 import { ScheduleDetails} from "../interfaces/schedule.js";
 
-export async function getSchedules( event_id: number = 0 )
+export async function getSchedules( event_id: number = 0, fromDate: string, toDate:string)
 {
 
     let query = database('event_schedule as es')
         .join('user', 'es.user_id', '=', 'user.id')
+        .join('events as e', 'es.events_id', '=', 'e.id')
         .select(
             'es.id',
             'es.description',
@@ -13,12 +14,15 @@ export async function getSchedules( event_id: number = 0 )
             'user.name as user_name',
             'es.events_id',
             'es.start_time',
-            'es.end_time'
+            'es.end_time',
+            'e.date'
         )
         .orderBy([{ column : "id",order: "desc"}])
 
     if (event_id) {
         query = query.where('es.events_id', event_id);
+    } else {
+        query = query.whereBetween('e.date', [fromDate, toDate]);
     }
     return query.then(rows => {
 
@@ -26,6 +30,7 @@ export async function getSchedules( event_id: number = 0 )
         for (let i = 0; i < rows.length; i++) {
             const schedule: ScheduleDetails = {
                 id: rows[i].id,
+                date: rows[i].date.toLocaleDateString('sr-Latn', { day: '2-digit', month: '2-digit', year: 'numeric' }),
                 description: rows[i].description,
                 user: {
                     id: rows[i].user_id,

@@ -11,10 +11,10 @@ assignmentrouter.get("/assignments/priorities", authenticate, async (request, re
     });
 });
 
-assignmentrouter.get("/assignments/list/:event_id", authenticate, async (request, response) => {
-    const eventId: number = parseInt(request.params.event_id);
-    console.log("REQUEST USER", request.user)
-    await getAssignments(eventId).then(rezultat => {
+assignmentrouter.get("/assignments/list/:event_id/:fromDate/:toDate", authenticate, async (request, response) => {
+    const {event_id , fromDate, toDate} = request.params;
+    const eventId = parseInt(event_id.toString());
+    await getAssignments(eventId, fromDate, toDate).then(rezultat => {
         response.json(rezultat)
     });
 });
@@ -28,14 +28,6 @@ assignmentrouter.post("/assignments/add", authenticate, async (request, response
     console.log(assignmentData);
 
 });
-//
-// assignmentrouter.post("/assignments/edit", authenticate, async (request, response) => {
-//     const podaciKomitenta = request.body;
-//     await editAssignments(podaciKomitenta, response);
-//     console.log(podaciKomitenta);
-//
-//
-// });
 
 
 export default assignmentrouter;
