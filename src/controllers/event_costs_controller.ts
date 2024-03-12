@@ -2,6 +2,7 @@ import express = require("express");
 import {authenticate} from "../middleware/auth_middleware";
 import {getEventCosts} from "../services/event_costs_services";
 import {addEventCost} from "../services/event_costs_services";
+import {costToExcel} from "../services/shared_services";
 
 
 const eventcostsrouter = express.Router()
@@ -25,7 +26,13 @@ eventcostsrouter.post("/cost/events/add", authenticate, async (request, response
     console.log(costData);
 })
 
-
+eventcostsrouter.get("/cost/excel/:event_id/:fromDate/:toDate/:language", authenticate, async (request, response) => {
+    const {event_id , fromDate, toDate, language} = request.params;
+    const eventId = parseInt(event_id.toString());
+    await costToExcel(eventId, fromDate, toDate, language).then(rezultat => {
+        response.send(rezultat)
+    });
+});
 
 
 export default eventcostsrouter;

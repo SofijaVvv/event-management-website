@@ -61,7 +61,6 @@ export async function calendar(year: number, month: number, status = 1) {
     }
 
     const weekday = firstDayOfMonth.day();
-    console.log(weekday, "weekday", firstDayOfMonth.isoWeek())
     if (weekday > 0) {
         for (let i = 1; i < weekday; i++) {
             calendar[0].push({});
@@ -84,7 +83,6 @@ export async function calendar(year: number, month: number, status = 1) {
             .andWhere('status_event_id', status);
 
         if (events.length) {
-            console.log(date,  day,  date.day());
             calendar[calRow].push({
                 date: day,
                 number_of_events: events.length,
@@ -168,8 +166,7 @@ export async function eventDetails(event_id: number = 0, fromDate?: string, toDa
                         id: rows[i].user_id,
                         name: rows[i].user_name
                     },
-                    description: rows[i].description,
-                    date: rows[i].date.toLocaleDateString('sr-Latn', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+                    description: rows[i].description, date: rows[i].date  .toLocaleDateString('sr-Latn', { day: '2-digit', month: '2-digit', year: 'numeric' }),
                     time: {id: parseInt(rows[i].time.substring(0, 2)), name: rows[i].time},
                     event_rating: rows[i].event_rating,
                     number_of_participants: rows[i].number_of_participants

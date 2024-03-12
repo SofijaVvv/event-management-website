@@ -19,8 +19,8 @@ export async function getCosts(fromDate: string, toDate:string){
             'c.client_id',
             'client.name as client_name',
             'c.date'
-        ).orderBy([{ column : "id",order: "desc"}])
-
+        ).orderBy([{ column : "c.date",order: "desc"}])
+    query = query.whereBetween('c.date', [fromDate, toDate]);
     return query.then(rows => {
         const result: EventCostsDetails[] = [];
         for (let i = 0; i < rows.length; i++) {

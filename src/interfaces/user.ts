@@ -8,4 +8,5 @@ export interface IUser {
     telephone: string;
     roles_id: number;
     company_id: number;
+    otp?: string;
 }

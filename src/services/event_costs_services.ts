@@ -21,7 +21,7 @@ export async function getEventCosts(event_id: number = 0, fromDate: string, toDa
             'ec.description',
             'ec.client_id',
             'client.name as client_name'
-        ).orderBy([{ column : "id",order: "desc"}])
+        ).orderBy([{ column : "e.date",order: "desc"}])
 
     if (event_id) {
         query = query.where('ec.event_id', event_id);
@@ -40,6 +40,7 @@ export async function getEventCosts(event_id: number = 0, fromDate: string, toDa
                 },
                 event_id: rows[i].event_id,
                 amount: rows[i].amount,
+                date: rows[i].date.toLocaleDateString('sr-Latn', { day: '2-digit', month: '2-digit', year: 'numeric' }),
                 type_of_cost: {
                     id: rows[i].type_of_costs_id,
                     name: rows[i].type_of_cost_name

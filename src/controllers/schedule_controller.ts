@@ -2,6 +2,8 @@ import express = require('express');
 import { authenticate } from '../middleware/auth_middleware';
 import {addSchedule, getSchedules} from '../services/schedule_services';
 import {addAssignment} from "../services/assignment_services";
+import {exportScheduleExcel} from "../services/excel_services";
+import {scheduleToExcel} from "../services/shared_services";
 
 const schedulerouter = express.Router();
 
@@ -26,5 +28,14 @@ schedulerouter.post("/schedule/add", authenticate, async (request, response) => 
     console.log(scheduleData);
 
 });
+
+schedulerouter.get("/schedule/excel/:event_id/:fromDate/:toDate/:language", authenticate, async (request, response) => {
+    const {event_id , fromDate, toDate, language} = request.params;
+    const eventId = parseInt(event_id.toString());
+    await scheduleToExcel(eventId, fromDate, toDate, language).then(rezultat => {
+        response.send(rezultat)
+    });
+});
+
 
 export default schedulerouter;

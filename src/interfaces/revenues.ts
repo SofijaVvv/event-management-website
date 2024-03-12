@@ -9,4 +9,14 @@ export interface RevenuesDetails {
     description: string;
     quantity: number;
     unit: Details;
+    date: string;
+}
+
+
+export interface RevenuesAnalisysDetails {
+    date: string;
+    client: string;
+    amount: number;
+
+
 }

@@ -1,6 +1,7 @@
 import express = require("express");
 import {authenticate} from "../middleware/auth_middleware";
 import {addAssignment, getAssignments, getPriorities} from "../services/assignment_services";
+import {assignmentsToExcel} from "../services/shared_services";
 
 const assignmentrouter = express.Router()
 
@@ -19,6 +20,8 @@ assignmentrouter.get("/assignments/list/:event_id/:fromDate/:toDate", authentica
     });
 });
 
+
+
 assignmentrouter.post("/assignments/add", authenticate, async (request, response) => {
     const assignmentData = request.body;
     assignmentData.user.id = request.user.id;
@@ -29,5 +32,12 @@ assignmentrouter.post("/assignments/add", authenticate, async (request, response
 
 });
 
+assignmentrouter.get("/assignments/excel/:event_id/:fromDate/:toDate/:language", authenticate, async (request, response) => {
+    const {event_id , fromDate, toDate, language} = request.params;
+    const eventId = parseInt(event_id.toString());
+    await assignmentsToExcel(eventId, fromDate, toDate, language).then(rezultat => {
+        response.send(rezultat)
+    });
+});
 
 export default assignmentrouter;

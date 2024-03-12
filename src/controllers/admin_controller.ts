@@ -47,15 +47,6 @@ adminrouter.post("/admin/user/reset", authenticate, async (request, response) =>
 });
 
 
-adminrouter.post("/login", async (request, response) => {
-
-    const podaciOperatera: IUser = request.body;
-    await logIn(podaciOperatera).then(result => {
-        console.log(result,"login_result")
-        response.json(result)
-    });
-
-});
 
 
 adminrouter.post("/admin/user/edit", authenticate, async (request, response) => {

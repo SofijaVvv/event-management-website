@@ -3,8 +3,8 @@
 
 
 import nodemailer from 'nodemailer';
-
-async function sendMail(email_to: string, email_subject: string, email_text: string) {
+import nodemailerHtmlToText from 'nodemailer-html-to-text';
+async function sendMail(email_to: string, email_subject: string, email_text: string, generatedQRCode: string) {
     const transporter = nodemailer.createTransport({
         service: 'mail.genije.me',
         host: 'mail.genije.me',
@@ -15,12 +15,16 @@ async function sendMail(email_to: string, email_subject: string, email_text: str
         }
     });
 
+    transporter.use('compile', nodemailerHtmlToText.htmlToText());
+    const html = `${email_text}`
     const mailOptions = {
         from: 'no-reply@genije.me',
         to: email_to,
         subject: email_subject,
-        text: email_text
+        // text: email_text,
+        html: html
     };
+    console.log('email poruka', email_text)
 
     return transporter.sendMail(mailOptions)
         .then(info => {

@@ -8,9 +8,10 @@ import zadaciRouter from './src/controllers/assignment_controller.js';
 import rasporedRouter from './src/controllers/schedule_controller.js';
 import troskoviRouter from './src/controllers/event_costs_controller';
 import prihodiRouter from './src/controllers/revenue_controller.js';
-import sharedrouter from "./src/services/shared_services";
+import sharedrouter from "./src/controllers/shared_controller";
 import analisysrouter from "./src/controllers/analisys_controller";
 import costsrouter from "./src/controllers/costs_controller";
+import loginrouter from "./src/controllers/login_conroller";
 
 const app = express();
 
@@ -26,6 +27,7 @@ app.use(prihodiRouter);
 app.use(sharedrouter)
 app.use(analisysrouter)
 app.use(costsrouter)
+app.use(loginrouter)
 
 export default app;
 

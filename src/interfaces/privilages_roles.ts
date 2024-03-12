@@ -7,3 +7,9 @@ export interface IPrivilegesRoles {
      app_id: number;
 
 }
+
+export interface IPrivilages {
+    key: string;
+    route: string;
+    value: IPrivilegesRoles[];
+}

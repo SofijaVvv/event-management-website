@@ -4,8 +4,10 @@ import {IUser} from "../interfaces/user.js";
 import {IRoles} from "../interfaces/roles";
 import {IApplication} from "../interfaces/app";
 import {IPrivileges} from "../interfaces/privileges";
-import {IPrivilegesRoles} from "../interfaces/privilages_roles";
+import {IPrivilages, IPrivilegesRoles} from "../interfaces/privilages_roles";
 import sendMail from './mail_service';
+import QRCode from 'qrcode';
+import {generateOtpQRCode, generateOTPSecret} from "./otp_service";
 function generatePassword(length: number, minLowercase: number, minUppercase: number, minDigits: number, minSymbols: number): string {
 
     const lowercaseChars = 'abcdefghijklmnopqrstuvwxyz';
@@ -73,17 +75,22 @@ export async function createUser(userInfo: IUser){
     }
 
 
-   const generated_password  = generatePassword(12, 2, 2, 1, 1);
-console.log('generisan password', userInfo.password)
-    const hashed_password = await bcrypt.hash(generated_password, 12)
+   const generatedPassword  =  generatePassword(12, 2, 2, 1, 1);
+    const generatedSecretKey = await generateOTPSecret();
+    userInfo.key = generatedSecretKey.base32;
+    const generatedQRCode = await generateOtpQRCode(userInfo.key, userInfo.email);
+console.log('generisan password', generatedPassword)
+    const hashed_password = await bcrypt.hash(generatedPassword, 12)
             try {
                 userInfo.password = hashed_password;
                 const insertedIds = await database("user")
                     .insert(userInfo);
 
-                let email_subject = "Your password for the Application Dogadjaji"
-                let email_body = `Your credentials for the Application Dogadjaji are: \n email: ${userInfo.email} \n password: ${generated_password} \n Please change your password after first login! \n Thank you! \n`
-                  await sendMail(userInfo.email, email_subject,email_body)
+                let email_subject = "Your password for the Application LGProject"
+                let email_body = `<p>Your credentials for the Application Dogadjaji are:</p> <div>email: <b>${userInfo.email}</b></div> <div>password: <b>${generatedPassword}</b> </div>
+<p>For one time password (OTP) download free Google or Microsoft Authentication application and  scan following QR code:</p>
+<p><img src="${generatedQRCode}" alt="QR Code"/></p>`
+                  await sendMail(userInfo.email, email_subject,email_body, generatedQRCode)
                     .then(r => {
                         if (r.error){
                             return {error: true, message: " Client inserted but mail is not sent!"};
@@ -109,9 +116,10 @@ export async function resetPassword(userEmail: { email : "" }){
     }
 
 
-    const generated_password  = generatePassword(12, 2, 2, 1, 1);
-    console.log('generisan password', userEmail.email)
+    const generated_password  =  generatePassword(12, 2, 2, 1, 1);
+    console.log('generisan password', generated_password)
     const hashed_password = await bcrypt.hash(generated_password, 12)
+    const generatedQRCode = await generateOtpQRCode(retrievedUser.key, userEmail.email);
     try {
         const newPassword= {
             password : hashed_password
@@ -119,9 +127,11 @@ export async function resetPassword(userEmail: { email : "" }){
         const insertedIds = await database("user").where('id', retrievedUser.id)
             .update(newPassword)
 
-        let email_subject = "Password reset for the Application Dogadjaji"
-        let email_body = `Your credentials for the Application Dogadjaji are: \n email: ${userEmail.email} \n password: ${generated_password} \n  Thank you! \n`
-        await sendMail(userEmail.email, email_subject,email_body)
+        let email_subject = "Password reset for the Application LGProject"
+        let email_body = `<p>Your credentials for the Application Dogadjaji are:</p> <div>email: <b>${userEmail.email}</b></div> <div>password: <b>${generated_password}</b> </div>
+<p>For one time password (OTP) download free Google or Microsoft Authentication application and  scan following QR code:</p>
+<p><img src="${generatedQRCode}" alt="QR Code"/></p>`
+        await sendMail(userEmail.email, email_subject,email_body, generatedQRCode)
             .then(r => {
                 if (r.error){
                     return {error: true, message: " Client inserted but mail is not sent!"};
@@ -256,7 +266,7 @@ export async function editPrivileges(updatePrivilege:IPrivilegesRoles){
 
 }
 
-export async function getPrivilagesRoles(roles_id: number): Promise<IPrivilegesRoles[]>{
+export async function getPrivilagesRoles(roles_id: number): Promise<IPrivilages[]>{
     return database.from('roles as u')
         .join('roles_privileges as up', 'u.id', '=', 'up.roles_id')
         .join('privileges as p', 'up.privileges_id', '=', 'p.id')

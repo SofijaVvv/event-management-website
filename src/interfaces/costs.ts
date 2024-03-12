@@ -8,6 +8,7 @@ export interface EventCostsDetails {
     amount: number;
     description: string;
     user: Details;
+    date: string;
 }
 
 export interface CostsDetails {

@@ -1,85 +1,194 @@
-import express = require("express");
-import {authenticate,} from "../middleware/auth_middleware";
+import database from "../repository /db";
+import {IUser} from "../interfaces/user";
+import {Details} from "../interfaces/events";
 import {
-    getClients, getCostsType,
-    getEventStatuses,
-    getEventTypes,
-    getLocations, getRevenuesTypes,
-    getSharedUsers, getTypeOfClients, getUnits
-} from "../controllers/shared_controller";
-import {getRevenues} from "./revenue_services";
+    exportAssignmentsExcel,
+    exportCostExcel,
+    exportEventsExcel,
+    exportScheduleExcel
+} from "./excel_services";
+import {eventDetails} from "./event_services";
+import {getAssignments} from "./assignment_services";
+import {getSchedules} from "./schedule_services";
+import {getCosts} from "./costs_services";
+import {getEventCosts} from "./event_costs_services";
 
 
-const sharedrouter   = express.Router()
+export async function getSharedUsers():Promise<IUser[]>{
+    return database('user')
+        .select(
+            'user.id',
+            'user.name',
+        )
+        .orderBy([{ column : "name",order: "asc"}])
+        .then((rows: any) => {
+            return (rows);
+        })
+}
 
-sharedrouter.get("/shared/users", authenticate, async (_request, response) => {
-    console.log(_request.url, _request.baseUrl)
-    await getSharedUsers().then(rezultat => {
-        response.json(rezultat)
-    })
-});
+export async function getLocations():Promise<Details[]>{
+    return database('location')
+        .select(
+            'location.id',
+            'location.name',
+        )
+        .orderBy([{ column : "name",order: "asc"}])
+        .then((rows: any) => {
+            return (rows);
+        })
+}
+
+export async function getEventTypes():Promise<Details[]>{
+    return database('type_of_events')
+        .select(
+            'type_of_events.id',
+            'type_of_events.name',
+        )
+        .orderBy([{ column : "name",order: "asc"}])
+        .then((rows: any) => {
+            return (rows);
+        })
+}
+
+export async function getEventStatuses():Promise<Details[]>{
+    return database('event_status')
+        .select(
+            'event_status.id',
+            'event_status.name',
+        )
+        .orderBy([{ column : "name",order: "asc"}])
+        .then((rows: any) => {
+            return (rows);
+        })
+}
+
+export async function getClients():Promise<Details[]>{
+    return database('client')
+        .select(
+            'client.id',
+            'client.name',
+        )
+        .orderBy([{ column : "name",order: "asc"}])
+        .then((rows: any) => {
+            return (rows);
+        })
+}
+
+export async function getTypeOfClients():Promise<Details[]>{
+    return database('type_of_client')
+        .select(
+            'type_of_client.id',
+            'type_of_client.name',
+        )
+        .orderBy([{ column : "name",order: "asc"}])
+        .then((rows: any) => {
+            return (rows);
+        })
+}
+
+export async function getRevenuesTypes():Promise<Details[]>{
+    return database('type_of_revenues')
+        .select(
+            'type_of_revenues.id',
+            'type_of_revenues.name',
+        )
+        .orderBy([{ column : "name",order: "asc"}])
+        .then((rows: any) => {
+            return (rows);
+        })
+}
+
+export async function getUnits():Promise<Details[]>{
+    return database('units')
+        .select(
+            'units.id',
+            'units.name',
+        )
+        .orderBy([{ column : "name",order: "asc"}])
+        .then((rows: any) => {
+            return (rows);
+        })
+}
+
+export async function getCostsType():Promise<Details[]>{
+    return database('type_of_costs')
+        .select(
+            'type_of_costs.id',
+            'type_of_costs.name',
+        )
+        .orderBy([{ column : "name",order: "asc"}])
+        .then((rows: any) => {
+            return (rows);
+        })
+}
+
+// 'Location',
+//     'Event Type',
+//     'Status Type',
+//     'Client Type',
+//     'Revenue Type',
+//     'Unit Type',
+//     'Expense Type'
+export async function updateShared(sharedType: string, data: Details,):Promise<any>{
+    let table = '';
+    switch (sharedType) {
+        case 'Location':
+            table = 'location';
+            break;
+        case 'Event Type':
+            table = 'type_of_events';
+            break;
+        case 'Event Status':
+            table = 'event_status';
+            break;
+        case 'Client Type':
+            table = 'type_of_client';
+            break;
+        case 'Revenue Type':
+            table = 'type_of_revenues';
+            break;
+        case 'Unit Type':
+            table = 'units';
+            break;
+        case 'Expense Type':
+            table = 'type_of_costs';
+            break;
+    }
+    console.log(table, data, "table, data")
+    if (data.id === 0) {
+        return database(table).insert(data)
+            .then((rows: any) => {
+                return {error:false, message: rows[0].toString()};
+            })
+    } else {
+        return database(table).where({id: data.id}).update(data)
+            .then((rows: any) => {
+                return {error:false, message: data.id.toString()};
+            })
+    }
+}
 
 
-sharedrouter.get("/shared/locations", authenticate, async (_request, response) => {
-    console.log(_request.url, _request.baseUrl)
-    await getLocations().then(rezultat => {
-        response.json(rezultat)
-    })
-});
+export async function eventsToExcel(eventId: number, fromDate: string, toDate: string, language: string):Promise<any>{
+    const result = await eventDetails(eventId,fromDate,toDate);
+    return exportEventsExcel(result, language, fromDate, toDate);
+}
 
+export async function assignmentsToExcel(eventId: number, fromDate: string, toDate: string, language: string):Promise<any>{
+    const result = await getAssignments(eventId,fromDate,toDate);
+    return exportAssignmentsExcel(result, language, fromDate, toDate);
+}
 
-sharedrouter.get("/shared/event_types", authenticate, async (_request, response) => {
-    console.log(_request.url, _request.baseUrl)
-    await getEventTypes().then(rezultat => {
-        response.json(rezultat)
-    })
-});
+export async function scheduleToExcel(eventId: number, fromDate: string, toDate: string, language: string):Promise<any>{
+    const result = await getSchedules(eventId,fromDate,toDate);
+    return exportScheduleExcel(result, language, fromDate, toDate);
+}
 
-sharedrouter.get("/shared/event_statuses", authenticate, async (_request, response) => {
-    console.log(_request.url, _request.baseUrl)
-    await getEventStatuses().then(rezultat => {
-        response.json(rezultat)
-    })
-});
+export async function costToExcel(eventId: number, fromDate: string, toDate: string, language: string):Promise<any>{
+    const result = await getCosts(fromDate,toDate);
+    const result1 = await getEventCosts(eventId,fromDate,toDate);
+    result.push(...result1);
 
-sharedrouter.get("/shared/clients", authenticate, async (_request, response) => {
-    console.log(_request.url, _request.baseUrl)
-    await getClients().then(rezultat => {
-        response.json(rezultat)
-    })
-});
+    return exportCostExcel(result, language, fromDate, toDate);
+}
 
-sharedrouter.get("/shared/type_of_client", authenticate, async (_request, response) => {
-    console.log(_request.url, _request.baseUrl)
-    await getTypeOfClients().then(rezultat => {
-        response.json(rezultat)
-    })
-});
-
-
-sharedrouter.get("/shared/revenue_types", authenticate, async (_request, response) => {
-    console.log(_request.url, _request.baseUrl)
-    await getRevenuesTypes().then(rezultat => {
-        response.json(rezultat)
-    })
-});
-
-sharedrouter.get("/shared/units", authenticate, async (_request, response) => {
-    console.log(_request.url, _request.baseUrl)
-    await getUnits().then(rezultat => {
-        response.json(rezultat)
-    })
-});
-
-
-sharedrouter.get("/shared/costs_types", authenticate, async (_request, response) => {
-    console.log(_request.url, _request.baseUrl)
-    await getCostsType().then(rezultat => {
-        response.json(rezultat)
-    })
-});
-
-
-
-
-export default sharedrouter;
