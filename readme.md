@@ -16,16 +16,18 @@ Backend for event management.
 
 2.Navigate to the project directory:
 
-    `cd backend`
+    cd backend
 
 3.Install dependencies:
 
-    `npm install`
+    npm install
 
 ##Running the project:
 
-- Install Nodemon 
-`npm install nodemon`
+- Install Nodemon
+  
+npm install nodemon
+
 - Run `nodemon start` to run the project 
 
 
