@@ -26,7 +26,7 @@ Backend for event management.
 
 - Install Nodemon
   
-npm install nodemon
+`npm install nodemon`
 
 - Run `nodemon start` to run the project 
 
