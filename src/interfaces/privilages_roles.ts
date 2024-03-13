@@ -5,7 +5,6 @@ export interface IPrivilegesRoles {
     roles_name: string;
     privileges_name: string;
      app_id: number;
-
 }
 
 export interface IPrivilages {

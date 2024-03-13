@@ -12,6 +12,4 @@ export interface IClient {
     type_of_client: Details;
     bank_account: string;
     note: string;
-
-
 }

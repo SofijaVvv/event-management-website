@@ -1,6 +1,5 @@
 import database from "../repository /db.js";
-import {CostsDetails, EventCostsDetails} from "../interfaces/costs.js";
-
+import {EventCostsDetails} from "../interfaces/costs.js";
 
 
 export async function getEventCosts(event_id: number = 0, fromDate: string, toDate:string ){
@@ -57,13 +56,12 @@ export async function getEventCosts(event_id: number = 0, fromDate: string, toDa
     });
 }
 
+
 export async function addEventCost(newCost: EventCostsDetails){
-    console.log(newCost,"novi trosak")
     const dataForInsert = {
         description: newCost.description,
         user_id: newCost.user.id,
         event_id: newCost.event_id,
-        // date: newCost.date,
         amount: newCost.amount,
         type_of_costs_id: newCost.type_of_cost.id,
         client_id: newCost.client.id

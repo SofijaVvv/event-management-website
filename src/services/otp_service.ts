@@ -20,5 +20,3 @@ export async function verifyUserOTP(OTP:string, userSecret:string){
     });
 }
 
-// - kod upisa opretera (generateOTPSecret(), genetateOtpQRCode())
-// - u login za provjeru otp verify

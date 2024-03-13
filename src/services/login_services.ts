@@ -3,10 +3,8 @@ import database from "../repository /db";
 import bcrypt = require("bcrypt");
 import jwt = require("jsonwebtoken");
 import settings = require("../middleware/settings");
-import {response} from "express";
 import {getPrivilagesRoles} from "./admin_services";
 import {TOKEN_EXPIRES_IN} from "../middleware/settings";
-import {verifyUserOTP} from "./otp_service";
 
 
 async function signToken(payload) {
@@ -20,6 +18,7 @@ async function signToken(payload) {
     });
 }
 
+
 async function getAdmin(roleId:number){
     const data =  await database('roles').select().where('id',roleId).first();
     if (data){
@@ -30,9 +29,9 @@ async function getAdmin(roleId:number){
     return false;
 }
 
+
 export async function logIn(podaciOperatera:IUser){
     try {
-        // for given email find user in database
         const retrievedUser = await database("user")
             .where({ email: podaciOperatera.email })
             .first();
@@ -40,33 +39,16 @@ export async function logIn(podaciOperatera:IUser){
             return ({ error: true, message: "Invalid username or password!" });
         }
 
-        // compare given password with hashed password from database
         const areSamePasswords = await bcrypt.compare(podaciOperatera.password, retrievedUser.password);
         if (!areSamePasswords) {
             return ({ error: true, message: "Invalid username or password!" });
         }
 
-        // get user privileges and convert them to array of objects with items  {route, can_view, can_edit}
         const privileges = await getPrivilagesRoles(retrievedUser.roles_id);
 
         if (retrievedUser.activity == 0){
             return ({ error: true, message: "User is not active!" });
         }
-
-        /////  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        //// Moramo provjeriti retrivedUser.activity i ako je 0 onda ne dozvoliti logovanje
-        /////  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-        // check OTP
-        // const userOTP = podaciOperatera.otp;
-        // const userSecret = retrievedUser.key;
-        // console.log(userOTP, userSecret, "OTP")
-        // const isOTPOk  = await verifyUserOTP(userOTP, userSecret)
-        // if (!isOTPOk) {
-        //     return ({ error: true, message: "Invalid OTP!" });
-        // }
-        //
-
 
         let loginPrivileges = [];
         for (let i = 0; i < privileges.length; i++) {
@@ -86,7 +68,6 @@ export async function logIn(podaciOperatera:IUser){
             loginPrivileges.push(tmp);
         }
 
-        // create token with email as payload and return it
         const payload = { email: retrievedUser.email };
         try {
             const result = await signToken(payload);

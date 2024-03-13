@@ -1,10 +1,11 @@
-import ExcelJS from 'exceljs';
-import {Border} from "exceljs";
+import ExcelJS, {Border} from 'exceljs';
+
 
 export async function exportEventsExcel(data, language = 'en', fromDate:string, toDate:string) {
   const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet("Izvjestaj");
     let borderStyle: Partial<Border> = { style: 'thin', color: { argb: '00000000' } };
+
       worksheet.addRow([`Pregled dogadjaja ${fromDate} do ${toDate}`])
       worksheet.columns = [
           { header: "ID", key: "id", width: 10 },
@@ -19,8 +20,9 @@ export async function exportEventsExcel(data, language = 'en', fromDate:string, 
           { header: "Ocjena dogadjaja", key: "event_rating", width: 8 },
           { header: "Broj ucesnika", key: "number_of_participants", width: 11, alignment: { vertical: 'middle', horizontal: 'center' } }
           ]
-    let header = worksheet.addRow(worksheet.columns.map(column => column.header));
-      header.eachCell((cell, number) => {
+
+    let headerEvent = worksheet.addRow(worksheet.columns.map(column => column.header));
+      headerEvent.eachCell((cell, number) => {
             cell.border = {
                 top: borderStyle,
                 left: borderStyle,
@@ -33,21 +35,23 @@ export async function exportEventsExcel(data, language = 'en', fromDate:string, 
               fgColor: { argb: 'e1e1e1' }
           }
       });
-    let cell = worksheet.getCell('A1');
-    cell.value = `Pregled dogadjaja ${fromDate} do ${toDate}`;
-    cell.font = { bold: true };
-    cell.alignment = { vertical: 'middle', horizontal: 'center' };
-    cell.fill = {
+
+    let cellEvent = worksheet.getCell('A1');
+    cellEvent.value = `Pregled dogadjaja ${fromDate} do ${toDate}`;
+    cellEvent.font = { bold: true };
+    cellEvent.alignment = { vertical: 'middle', horizontal: 'center' };
+    cellEvent.fill = {
         type: 'pattern',
         pattern: 'solid',
         fgColor: { argb: 'f1f1f1' }
     }
-    cell.border = {
+    cellEvent.border = {
         top: borderStyle,
         left: borderStyle,
         bottom: borderStyle,
         right: borderStyle
     };
+
     worksheet.mergeCells('A1:K1');
       for (let i = 0; i < data.length; i++) {
           console.log(i);
@@ -73,12 +77,7 @@ export async function exportEventsExcel(data, language = 'en', fromDate:string, 
                 };
             });
       }
-      // workbook.xlsx.write(res).then(function() {
-      //     res.end();
-      // });
-    const buffer = await workbook.xlsx.writeBuffer();
-    return buffer;
-
+   return await workbook.xlsx.writeBuffer();
 }
 
 
@@ -86,6 +85,7 @@ export async function exportAssignmentsExcel(data, language = 'en', fromDate:str
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Izvjestaj");
     let borderStyle: Partial<Border> = { style: 'thin', color: { argb: '00000000' } };
+
     worksheet.addRow([`Pregled zadataka ${fromDate} do ${toDate}`])
     worksheet.columns = [
         { header: "ID", key: "id", width: 10 },
@@ -95,8 +95,9 @@ export async function exportAssignmentsExcel(data, language = 'en', fromDate:str
         { header: "Datum", key: "datum", width: 15 },
         { header: "Operater", key: "operater", width: 20 },
     ]
-    let header = worksheet.addRow(worksheet.columns.map(column => column.header));
-    header.eachCell((cell, number) => {
+
+    let headerAssignments = worksheet.addRow(worksheet.columns.map(column => column.header));
+    headerAssignments.eachCell((cell, number) => {
         cell.border = {
             top: borderStyle,
             left: borderStyle,
@@ -109,21 +110,23 @@ export async function exportAssignmentsExcel(data, language = 'en', fromDate:str
             fgColor: { argb: 'e1e1e1' }
         }
     });
-    let cell = worksheet.getCell('A1');
-    cell.value = `Pregled zadataka ${fromDate} do ${toDate}`;
-    cell.font = { bold: true };
-    cell.alignment = { vertical: 'middle', horizontal: 'center' };
-    cell.fill = {
+
+    let cellAssignments = worksheet.getCell('A1');
+    cellAssignments.value = `Pregled zadataka ${fromDate} do ${toDate}`;
+    cellAssignments.font = { bold: true };
+    cellAssignments.alignment = { vertical: 'middle', horizontal: 'center' };
+    cellAssignments.fill = {
         type: 'pattern',
         pattern: 'solid',
         fgColor: { argb: 'f1f1f1' }
     }
-    cell.border = {
+    cellAssignments.border = {
         top: borderStyle,
         left: borderStyle,
         bottom: borderStyle,
         right: borderStyle
     };
+
     worksheet.mergeCells('A1:F1');
     for (let i = 0; i < data.length; i++) {
         console.log(i);
@@ -144,18 +147,15 @@ export async function exportAssignmentsExcel(data, language = 'en', fromDate:str
             };
         });
     }
-    // workbook.xlsx.write(res).then(function() {
-    //     res.end();
-    // });
-    const buffer = await workbook.xlsx.writeBuffer();
-    return buffer;
-
+    return await workbook.xlsx.writeBuffer();
 }
+
 
 export async function exportScheduleExcel(data, language = 'en', fromDate:string, toDate:string) {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Izvjestaj");
     let borderStyle: Partial<Border> = { style: 'thin', color: { argb: '00000000' } };
+
     worksheet.addRow([`Pregled rasporeda ${fromDate} do ${toDate}`])
     worksheet.columns = [
         { header: "ID", key: "id", width: 10 },
@@ -163,8 +163,9 @@ export async function exportScheduleExcel(data, language = 'en', fromDate:string
         { header: "Pocetak", key: "pocetak", width: 12},
         { header: "Kraj", key: "kraj", width: 15 }
     ]
-    let header = worksheet.addRow(worksheet.columns.map(column => column.header));
-    header.eachCell((cell, number) => {
+
+    let headerSchedule = worksheet.addRow(worksheet.columns.map(column => column.header));
+    headerSchedule.eachCell((cell, number) => {
         cell.border = {
             top: borderStyle,
             left: borderStyle,
@@ -177,21 +178,23 @@ export async function exportScheduleExcel(data, language = 'en', fromDate:string
             fgColor: { argb: 'e1e1e1' }
         }
     });
-    let cell = worksheet.getCell('A1');
-    cell.value = `Pregled dogadjaja ${fromDate} do ${toDate}`;
-    cell.font = { bold: true };
-    cell.alignment = { vertical: 'middle', horizontal: 'center' };
-    cell.fill = {
+
+    let cellSchedule = worksheet.getCell('A1');
+    cellSchedule.value = `Pregled dogadjaja ${fromDate} do ${toDate}`;
+    cellSchedule.font = { bold: true };
+    cellSchedule.alignment = { vertical: 'middle', horizontal: 'center' };
+    cellSchedule.fill = {
         type: 'pattern',
         pattern: 'solid',
         fgColor: { argb: 'f1f1f1' }
     }
-    cell.border = {
+    cellSchedule.border = {
         top: borderStyle,
         left: borderStyle,
         bottom: borderStyle,
         right: borderStyle
     };
+
     worksheet.mergeCells('A1:D1');
     for (let i = 0; i < data.length; i++) {
         console.log(i);
@@ -210,18 +213,15 @@ export async function exportScheduleExcel(data, language = 'en', fromDate:string
             };
         });
     }
-    // workbook.xlsx.write(res).then(function() {
-    //     res.end();
-    // });
-    const buffer = await workbook.xlsx.writeBuffer();
-    return buffer;
-
+ return await workbook.xlsx.writeBuffer();
 }
+
 
 export async function exportCostExcel(data, language = 'en', fromDate:string, toDate:string) {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Izvjestaj");
     let borderStyle: Partial<Border> = { style: 'thin', color: { argb: '00000000' } };
+
     worksheet.addRow([`Pregled troskova ${fromDate} do ${toDate}`])
     worksheet.columns = [
         { header: "ID", key: "id", width: 10 },
@@ -231,8 +231,9 @@ export async function exportCostExcel(data, language = 'en', fromDate:string, to
         { header: "Datum", key: "datum", width: 20 },
         { header: "Iznos", key: "iznos", width: 20 }
     ]
-    let header = worksheet.addRow(worksheet.columns.map(column => column.header));
-    header.eachCell((cell, number) => {
+
+    let headerCost = worksheet.addRow(worksheet.columns.map(column => column.header));
+    headerCost.eachCell((cell, number) => {
         cell.border = {
             top: borderStyle,
             left: borderStyle,
@@ -245,21 +246,23 @@ export async function exportCostExcel(data, language = 'en', fromDate:string, to
             fgColor: { argb: 'e1e1e1' }
         }
     });
-    let cell = worksheet.getCell('A1');
-    cell.value = `Pregled troskova ${fromDate} do ${toDate}`;
-    cell.font = { bold: true };
-    cell.alignment = { vertical: 'middle', horizontal: 'center' };
-    cell.fill = {
+
+    let cellCost = worksheet.getCell('A1');
+    cellCost.value = `Pregled troskova ${fromDate} do ${toDate}`;
+    cellCost.font = { bold: true };
+    cellCost.alignment = { vertical: 'middle', horizontal: 'center' };
+    cellCost.fill = {
         type: 'pattern',
         pattern: 'solid',
         fgColor: { argb: 'f1f1f1' }
     }
-    cell.border = {
+    cellCost.border = {
         top: borderStyle,
         left: borderStyle,
         bottom: borderStyle,
         right: borderStyle
     };
+
     worksheet.mergeCells('A1:F1');
     for (let i = 0; i < data.length; i++) {
         console.log(i);
@@ -280,13 +283,9 @@ export async function exportCostExcel(data, language = 'en', fromDate:string, to
             };
         });
     }
-    // workbook.xlsx.write(res).then(function() {
-    //     res.end();
-    // });
-    const buffer = await workbook.xlsx.writeBuffer();
-    return buffer;
-
+  return await workbook.xlsx.writeBuffer();
 }
+
 
 export async function exportAnalisysExcel(){
     const filePath = "/Applications/XAMPP/xamppfiles/htdocs/lgprojekat/backend/src/templates/analyse_template.xlsx"

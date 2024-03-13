@@ -1,13 +1,6 @@
 import express = require("express");
 import {authenticate,} from "../middleware/auth_middleware";
-import {
-    getClients, getCostsType,
-    getEventStatuses,
-    getEventTypes,
-    getLocations, getRevenuesTypes,
-    getSharedUsers, getTypeOfClients, getUnits, updateShared
-} from "../services/shared_services";
-import {getRevenues} from "../services/revenue_services";
+import {getClients, getCostsType, getEventStatuses, getEventTypes, getLocations, getRevenuesTypes, getSharedUsers, getTypeOfClients, getUnits, updateShared} from "../services/shared_services";
 
 
 const sharedrouter   = express.Router()
@@ -19,14 +12,12 @@ sharedrouter.get("/shared/users", authenticate, async (_request, response) => {
     })
 });
 
-
 sharedrouter.get("/shared/locations", authenticate, async (_request, response) => {
     console.log(_request.url, _request.baseUrl)
     await getLocations().then(rezultat => {
         response.json(rezultat)
     })
 });
-
 
 sharedrouter.get("/shared/event_types", authenticate, async (_request, response) => {
     console.log(_request.url, _request.baseUrl)
@@ -56,7 +47,6 @@ sharedrouter.get("/shared/type_of_client", authenticate, async (_request, respon
     })
 });
 
-
 sharedrouter.get("/shared/revenue_types", authenticate, async (_request, response) => {
     console.log(_request.url, _request.baseUrl)
     await getRevenuesTypes().then(rezultat => {
@@ -70,7 +60,6 @@ sharedrouter.get("/shared/units", authenticate, async (_request, response) => {
         response.json(rezultat)
     })
 });
-
 
 sharedrouter.get("/shared/costs_types", authenticate, async (_request, response) => {
     console.log(_request.url, _request.baseUrl)
@@ -86,8 +75,6 @@ sharedrouter.post("/shared/update", authenticate, async (request, response) => {
     await updateShared(sharedType, dataForInsert).then(rezultat => {
         response.json(rezultat)
     });
-
-
 });
 
 

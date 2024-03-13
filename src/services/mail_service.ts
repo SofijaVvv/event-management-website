@@ -1,9 +1,7 @@
-// instalirati nodemailer
-// npm install nodemailer
-
-
 import nodemailer from 'nodemailer';
 import nodemailerHtmlToText from 'nodemailer-html-to-text';
+
+
 async function sendMail(email_to: string, email_subject: string, email_text: string, generatedQRCode: string) {
     const transporter = nodemailer.createTransport({
         service: 'mail.genije.me',
@@ -28,16 +26,14 @@ async function sendMail(email_to: string, email_subject: string, email_text: str
 
     return transporter.sendMail(mailOptions)
         .then(info => {
-            // console.log('Email poslat uspjesno');
             return {error: false, message: "Mail sent"};
         })
         .catch(error => {
-            // console.log('Email nije poslat');
             return {error: true, info: error};
         }).finally(() => {
             transporter.close();
         });
-
-
 }
+
+
 export default sendMail;

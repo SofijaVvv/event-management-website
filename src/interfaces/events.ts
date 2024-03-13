@@ -10,10 +10,7 @@ export interface IEvents {
     user_id: number;
     description: string;
     number_of_participants: number;
-
 }
-
-
 
 export interface Details {
     id: number;

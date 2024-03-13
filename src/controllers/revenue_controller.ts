@@ -2,8 +2,8 @@ import express = require("express");
 import {authenticate} from "../middleware/auth_middleware";
 import {addRevenue, getRevenues} from "../services/revenue_services";
 
-const revenuerouter = express.Router()
 
+const revenuerouter = express.Router()
 
 revenuerouter.get("/revenue/list/:event_id/:fromDate/:toDate", authenticate, async (request, response) => {
     const fromDate: string = request.params.fromDate;
@@ -20,10 +20,7 @@ revenuerouter.post("/revenue/add", authenticate, async (request, response) => {
     await addRevenue(revenueData).then(rezultat => {
         response.json(rezultat)
     });
-    console.log(revenueData);
-
 });
-
 
 
 export default revenuerouter;

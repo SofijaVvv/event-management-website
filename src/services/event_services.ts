@@ -1,8 +1,8 @@
 import database from "../repository /db.js";
 import {IEvents} from "../interfaces/events.js";
 import {EventDetails} from "../interfaces/events.js";
+import moment from 'moment';
 
-import * as moment from 'moment';
 
 export async function addEvent(newEvent:EventDetails) {
     try {
@@ -34,7 +34,6 @@ export async function addEvent(newEvent:EventDetails) {
         }
 
     } catch (error) {
-        console.error('Greška prilikom dodavanja dogadjaja:', error);
         return { error: false, message: 'Error in inserting new event.' }
     }
 }
@@ -45,7 +44,6 @@ export async function addEvent(newEvent:EventDetails) {
 
 
 export async function calendar(year: number, month: number, status = 1) {
-
 
     const firstDayOfMonth = moment.parseZone(`${year}-${month}-01`);
 
@@ -108,6 +106,7 @@ export async function calendar(year: number, month: number, status = 1) {
     calendar.pop();
     return { calendar };
 }
+
 
 export async function eventDetails(event_id: number = 0, fromDate?: string, toDate?: string): Promise<EventDetails> {
 

@@ -1,6 +1,5 @@
 import database from "../repository /db.js";
-import {ScheduleDetails} from "../interfaces/schedule";
-import {RevenuesAnalisysDetails, RevenuesDetails} from "../interfaces/revenues";
+import {RevenuesDetails} from "../interfaces/revenues";
 
 
 export async function getRevenues( event_id: number = 0, fromDate:string, toDate:string )
@@ -62,6 +61,7 @@ export async function getRevenues( event_id: number = 0, fromDate:string, toDate
     });
 
 }
+
 
 export async function addRevenue(newRevenues: RevenuesDetails){
     const dataForInsert = {

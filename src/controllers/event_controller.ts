@@ -3,8 +3,8 @@ import {authenticate} from "../middleware/auth_middleware";
 import {addEvent, calendar,  eventDetails} from "../services/event_services";
 import {eventsToExcel} from "../services/shared_services";
 
-const eventrouter = express.Router()
 
+const eventrouter = express.Router()
 
 eventrouter.post("/events/add", authenticate, async (request, response) => {
     const podaciDogadjaja = request.body;
@@ -12,10 +12,7 @@ eventrouter.post("/events/add", authenticate, async (request, response) => {
     await addEvent(podaciDogadjaja).then(rezultat => {
         response.json(rezultat)
     });
-    console.log(podaciDogadjaja);
 });
-
-
 
 eventrouter.get("/events/calendar/:month/:year/:status", authenticate, async (request, response) => {
     const { month, year, status  } = request.params;
@@ -39,10 +36,9 @@ eventrouter.get("/events/excel/:event_id/:fromDate/:toDate/:language", authentic
     const { event_id, fromDate,toDate,language } = _request.params;
     const eventId = parseInt(event_id.toString());
     await eventsToExcel(eventId,fromDate,toDate, language).then(rezultat => {
-
         response.send(rezultat)
     });
-
 });
+
 
 export default eventrouter;

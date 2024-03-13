@@ -12,7 +12,6 @@ export interface RevenuesDetails {
     date: string;
 }
 
-
 export interface RevenuesAnalisysDetails {
     date: string;
     client: string;

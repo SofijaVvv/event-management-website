@@ -1,6 +1,6 @@
 import database from "../repository /db.js";
 import {AssignmentsDetails} from "../interfaces/assignments.js";
-import * as moment from 'moment';
+import moment from 'moment';
 
 
 export async function getPriorities(){
@@ -56,9 +56,7 @@ export async function getAssignments( event_id: number = 0, fromDate:string, toD
                 },
                 event_id: rows[i].event_id,
                 created_date: rows[i].created_date.toLocaleDateString('sr-Latn', { day: '2-digit', month: '2-digit', year: 'numeric' }),
-                end_date: rows[i].end_date //?
-                    // rows[i].end_date.toLocaleDateString('sr-Latn', { day: '2-digit', month: '2-digit', year: 'numeric' })
-                // : "",
+                end_date: rows[i].end_date
             }
             result.push(assignment);
         }
@@ -71,7 +69,7 @@ export async function getAssignments( event_id: number = 0, fromDate:string, toD
 
 
 export async function addAssignment(newAssignment: AssignmentsDetails){
-    // try {
+
     const createdDate = moment.parseZone(newAssignment.created_date).toDate();
     const endDate = moment.parseZone(newAssignment.end_date).toDate();
    const dataForInsert = {
@@ -84,7 +82,6 @@ export async function addAssignment(newAssignment: AssignmentsDetails){
          created_date: createdDate,
          end_date: endDate
    }
-   console.log(dataForInsert, "prije inserta")
    if (newAssignment.id){
        const createdDate = dataForInsert.created_date;
        delete dataForInsert.created_date;
@@ -99,10 +96,6 @@ export async function addAssignment(newAssignment: AssignmentsDetails){
        newAssignment.status = Number(newAssignment.status);
        newAssignment.id= insertedIds[0];
        return ({error: false, message: newAssignment});
-   // }
-   //  } catch (error){
-   //      return ({error: true, message: "Error adding assignment"});
-   //  }
 }
     }
 

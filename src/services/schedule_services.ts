@@ -1,8 +1,7 @@
 import database from "../repository /db.js";
-import { ScheduleDetails} from "../interfaces/schedule.js";
+import {ScheduleDetails} from "../interfaces/schedule.js";
 
-export async function getSchedules( event_id: number = 0, fromDate: string, toDate:string)
-{
+export async function getSchedules( event_id: number = 0, fromDate: string, toDate:string) {
 
     let query = database('event_schedule as es')
         .join('user', 'es.user_id', '=', 'user.id')
@@ -39,15 +38,13 @@ export async function getSchedules( event_id: number = 0, fromDate: string, toDa
                 event_id: rows[i].events_id,
                 start_time: {id: parseInt(rows[i].start_time.substring(0, 2)), name: rows[i].start_time},
                 end_time: {id: parseInt(rows[i].end_time.substring(0, 2)), name: rows[i].end_time}
-
             }
-
             result.push(schedule);
         }
         return result;
     });
-
 }
+
 
 export async function addSchedule(newSchedule: ScheduleDetails){
 
@@ -58,6 +55,7 @@ export async function addSchedule(newSchedule: ScheduleDetails){
         start_time: newSchedule.start_time.name,
         end_time: newSchedule.end_time.name
     }
+
     if (newSchedule.id){
         await database('event_schedule')
             .where('id', newSchedule.id)

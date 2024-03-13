@@ -1,12 +1,7 @@
 import database from "../repository /db";
 import {IUser} from "../interfaces/user";
 import {Details} from "../interfaces/events";
-import {
-    exportAssignmentsExcel,
-    exportCostExcel,
-    exportEventsExcel,
-    exportScheduleExcel
-} from "./excel_services";
+import {exportAssignmentsExcel, exportCostExcel, exportEventsExcel, exportScheduleExcel} from "./excel_services";
 import {eventDetails} from "./event_services";
 import {getAssignments} from "./assignment_services";
 import {getSchedules} from "./schedule_services";
@@ -26,6 +21,7 @@ export async function getSharedUsers():Promise<IUser[]>{
         })
 }
 
+
 export async function getLocations():Promise<Details[]>{
     return database('location')
         .select(
@@ -37,6 +33,7 @@ export async function getLocations():Promise<Details[]>{
             return (rows);
         })
 }
+
 
 export async function getEventTypes():Promise<Details[]>{
     return database('type_of_events')
@@ -50,6 +47,7 @@ export async function getEventTypes():Promise<Details[]>{
         })
 }
 
+
 export async function getEventStatuses():Promise<Details[]>{
     return database('event_status')
         .select(
@@ -61,6 +59,7 @@ export async function getEventStatuses():Promise<Details[]>{
             return (rows);
         })
 }
+
 
 export async function getClients():Promise<Details[]>{
     return database('client')
@@ -74,6 +73,7 @@ export async function getClients():Promise<Details[]>{
         })
 }
 
+
 export async function getTypeOfClients():Promise<Details[]>{
     return database('type_of_client')
         .select(
@@ -85,6 +85,7 @@ export async function getTypeOfClients():Promise<Details[]>{
             return (rows);
         })
 }
+
 
 export async function getRevenuesTypes():Promise<Details[]>{
     return database('type_of_revenues')
@@ -98,6 +99,7 @@ export async function getRevenuesTypes():Promise<Details[]>{
         })
 }
 
+
 export async function getUnits():Promise<Details[]>{
     return database('units')
         .select(
@@ -109,6 +111,7 @@ export async function getUnits():Promise<Details[]>{
             return (rows);
         })
 }
+
 
 export async function getCostsType():Promise<Details[]>{
     return database('type_of_costs')
@@ -122,13 +125,7 @@ export async function getCostsType():Promise<Details[]>{
         })
 }
 
-// 'Location',
-//     'Event Type',
-//     'Status Type',
-//     'Client Type',
-//     'Revenue Type',
-//     'Unit Type',
-//     'Expense Type'
+
 export async function updateShared(sharedType: string, data: Details,):Promise<any>{
     let table = '';
     switch (sharedType) {
@@ -154,7 +151,7 @@ export async function updateShared(sharedType: string, data: Details,):Promise<a
             table = 'type_of_costs';
             break;
     }
-    console.log(table, data, "table, data")
+
     if (data.id === 0) {
         return database(table).insert(data)
             .then((rows: any) => {

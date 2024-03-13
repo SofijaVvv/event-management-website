@@ -15,6 +15,8 @@ import loginrouter from "./src/controllers/login_conroller";
 
 const app = express();
 
+
+
 app.use(bodyParser.json());
 app.use(cors());
 app.use(adminRouter);

@@ -1,18 +1,16 @@
 import express = require("express");
 import {authenticate} from "../middleware/auth_middleware";
-
 import { addClient, getClient} from "../services/client_services";
-const clientrouter = express.Router()
 
+
+const clientrouter = express.Router()
 
 clientrouter.get("/client/:id", authenticate,  async (_request, response) => {
     const { id } = _request.params;
     const eventId = parseInt(id.toString());
-
     await getClient(eventId).then(rezultat => {
         response.json(rezultat)
     });
-
 });
 
 clientrouter.post("/client/add", authenticate, async (request, response) => {
@@ -24,6 +22,4 @@ clientrouter.post("/client/add", authenticate, async (request, response) => {
 });
 
 
-
-// komitentirouter.post("/komitenti/add", addKmitent);
 export default clientrouter;

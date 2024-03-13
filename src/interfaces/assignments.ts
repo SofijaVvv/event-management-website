@@ -1,6 +1,5 @@
 import {Details} from "./events";
 
-
 export interface AssignmentsDetails {
     id: number,
     description: string,
@@ -11,5 +10,4 @@ export interface AssignmentsDetails {
     created_date: Date,
     end_date: Date,
     date: string
-
 }

@@ -1,21 +1,17 @@
 import database from "../repository /db.js";
 import {RevenuesAnalisysDetails} from "../interfaces/revenues";
 
-import {Transaction} from "knex";
+import { Knex } from 'knex';
 
 
 
 
 export async function getAnalisysData(startDate: string, endDate: string) {
     try {
-        console.log(startDate, endDate, "fromdate, todate")
 
-        // Create temporary table
-        await database.transaction(async (trx: Transaction) => {
-            // Create temporary table
+        await database.transaction(async (trx: Knex.Transaction) => {
             await trx.raw('CREATE TEMPORARY TABLE temp_dates (date_column DATE)');
 
-            // Generate a series of dates within the specified range
             await trx.raw(`
             INSERT INTO temp_dates (date_column)
             SELECT DATE_ADD(?, INTERVAL n DAY) AS date_column
@@ -29,7 +25,6 @@ export async function getAnalisysData(startDate: string, endDate: string) {
         `, [startDate, startDate, startDate, endDate]);
         });
 
-        // Your main query
         const result = await database.raw(`
           SELECT
           DATE_FORMAT(temp_dates.date_column, '%d.%m') as date,
@@ -59,41 +54,29 @@ export async function getAnalisysData(startDate: string, endDate: string) {
     } catch (error) {
 
         return {error: true, message: `Error in executing SQL query ${error}`};
-    } finally {
-        // Close the database connection
-        // await database.destroy();
-
     }
 }
 
 export async function numberOfEventsForPeriod(startDate: string, endDate: string){
-    console.log(startDate, endDate, "fromdate, todate")
-
 
     let numberOfEvents = await database('events')
         .count('id as number_of_events')
         .sum('number_of_participants as number_of_participants')
         .whereBetween('date', [startDate, endDate])
 
-
     let totalRevenues = await database('revenues as r')
         .sum(database.raw('(r.amount * r.quantity)') )
         .join('events as e', 'r.events_id', '=', 'e.id')
         .whereBetween('e.date', [startDate, endDate])
-
 
     let totalEventCosts = await database('event_costs as ec')
         .sum('ec.amount as total_events_cost')
         .join('events as e', 'ec.event_id', '=', 'e.id')
         .whereBetween('e.date', [startDate, endDate])
 
-
     let totalCosts = await database('costs as c')
         .sum('c.amount as total_cost')
         .whereBetween('c.date', [startDate, endDate])
-
-
-    console.log(numberOfEvents, totalRevenues[0]['sum((r.amount * r.quantity))'], totalCosts, "number of events, total revenues, total costs")
 
     let tmp = {
         number_of_events: numberOfEvents[0].number_of_events ? numberOfEvents[0].number_of_events : 0,
@@ -102,10 +85,7 @@ export async function numberOfEventsForPeriod(startDate: string, endDate: string
         total_events_cost: totalEventCosts[0].total_events_cost ? totalEventCosts[0].total_events_cost : 0,
         total_cost: totalCosts[0].total_cost ? totalCosts[0].total_cost : 0
     }
-
     return {error: false, message: tmp}
-
-
 }
 
 export async function getAnalisysRevenueData(fromDate: string, toDate: string) {
@@ -115,7 +95,6 @@ export async function getAnalisysRevenueData(fromDate: string, toDate: string) {
         .select(
             'e.date',
             database.raw('sum(rev.amount * rev.quantity) as total_revenue'),
-
             'c.name as client_name'
         )
         .whereBetween('e.date', [fromDate, toDate])

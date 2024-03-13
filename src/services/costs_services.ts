@@ -1,6 +1,6 @@
 import database from "../repository /db.js";
 import {CostsDetails, EventCostsDetails} from "../interfaces/costs";
-import * as moment from 'moment';
+import moment from 'moment';
 
 export async function getCosts(fromDate: string, toDate:string){
 

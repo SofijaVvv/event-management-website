@@ -7,7 +7,6 @@ import {costToExcel} from "../services/shared_services";
 
 const eventcostsrouter = express.Router()
 
-
 eventcostsrouter.get("/cost/events/:event_id/:fromDate/:toDate", authenticate, async (request, response) => {
     const { event_id, fromDate,toDate } = request.params;
     const eventId = parseInt(event_id.toString());
@@ -15,7 +14,6 @@ eventcostsrouter.get("/cost/events/:event_id/:fromDate/:toDate", authenticate, a
         response.json(rezultat)
     });
 });
-
 
 eventcostsrouter.post("/cost/events/add", authenticate, async (request, response) => {
     const costData = request.body;
