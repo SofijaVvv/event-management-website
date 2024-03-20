@@ -18,7 +18,7 @@ export async function getClient(client_id: number = 0) {
             'c.note',
             'c.type_of_client',
             'toc.name as type_of_client_name'
-        ).orderBy([{ column: "id", order: "desc" }])
+        ).orderBy([{ column: "name", order: "asc" }])
 
     if (client_id) {
         query = query.where('c.id', client_id);

@@ -73,7 +73,9 @@ export async function addEventCost(newCost: EventCostsDetails){
         return ({error:false, message: newCost})
     }
     else{
-        await database('event_costs').insert(dataForInsert);
+        let newID  = await database('event_costs').insert(dataForInsert);
+        console.log(newID, "NEW ID")
+        newCost.id = newID[0];
         return ({error:false, message: newCost})
     }
 }

@@ -1,6 +1,6 @@
 import express = require("express");
 import {authenticate} from "../middleware/auth_middleware";
-import {addAssignment, getAssignments, getPriorities} from "../services/assignment_services";
+import {addAssignment, getAssignmentList, getAssignments, getPriorities} from "../services/assignment_services";
 import {assignmentsToExcel} from "../services/shared_services";
 
 
@@ -20,6 +20,15 @@ assignmentrouter.get("/assignments/list/:event_id/:fromDate/:toDate", authentica
     });
 });
 
+
+assignmentrouter.get("/assignments/list_events/:event_id/:fromDate/:toDate", authenticate, async (request, response) => {
+    const {event_id , fromDate, toDate} = request.params;
+    const eventId = parseInt(event_id.toString());
+    await getAssignmentList(eventId, fromDate, toDate).then(rezultat => {
+        response.json(rezultat)
+    });
+});
+
 assignmentrouter.post("/assignments/add", authenticate, async (request, response) => {
     const assignmentData = request.body;
     assignmentData.user.id = request.user.id;
@@ -35,6 +44,7 @@ assignmentrouter.get("/assignments/excel/:event_id/:fromDate/:toDate/:language",
         response.send(rezultat)
     });
 });
+
 
 
 export default assignmentrouter;

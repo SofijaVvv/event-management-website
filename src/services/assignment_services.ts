@@ -1,6 +1,7 @@
 import database from "../repository /db.js";
 import {AssignmentsDetails} from "../interfaces/assignments.js";
 import moment from 'moment';
+import {eventDetails} from "./event_services";
 
 
 export async function getPriorities(){
@@ -16,7 +17,6 @@ export async function getPriorities(){
 
 export async function getAssignments( event_id: number = 0, fromDate:string, toDate:string )
 {
-
     let query = database('event_assignments as ea')
         .join('user', 'ea.user_id', '=', 'user.id')
         .join('events as e', 'ea.events_id', '=', 'e.id')
@@ -66,6 +66,16 @@ export async function getAssignments( event_id: number = 0, fromDate:string, toD
 }
 
 
+
+
+
+export async function getAssignmentList( event_id: number = 0, fromDate:string, toDate:string ){
+    const eventsList : any[] = await eventDetails(0, fromDate, toDate);
+    for (let i = 0; i < eventsList.length; i++) {
+        eventsList[i].assignments = await getAssignments(eventsList[i].id, fromDate, toDate);
+    }
+    return eventsList;
+}
 
 
 export async function addAssignment(newAssignment: AssignmentsDetails){

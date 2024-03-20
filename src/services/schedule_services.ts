@@ -1,5 +1,16 @@
 import database from "../repository /db.js";
 import {ScheduleDetails} from "../interfaces/schedule.js";
+import {eventDetails} from "./event_services";
+import {getAssignments} from "./assignment_services";
+
+
+export async function getScheduleList( event_id: number = 0, fromDate:string, toDate:string ){
+    const eventsList : any[] = await eventDetails(0, fromDate, toDate);
+    for (let i = 0; i < eventsList.length; i++) {
+        eventsList[i].schedules = await getSchedules(eventsList[i].id, fromDate, toDate);
+    }
+    return eventsList;
+}
 
 export async function getSchedules( event_id: number = 0, fromDate: string, toDate:string) {
 

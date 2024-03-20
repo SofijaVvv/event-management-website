@@ -69,7 +69,8 @@ export async function addOtherCost(newCost: CostsDetails){
         return ({error:false, message: newCost})
     }
     else{
-        await database('costs').insert(dataForInsert);
+        let newID = await database('costs').insert(dataForInsert);
+        newCost.id = newID[0];
         return ({error:false, message: newCost})
     }
 }

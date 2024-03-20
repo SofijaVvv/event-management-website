@@ -108,7 +108,7 @@ export async function calendar(year: number, month: number, status = 1) {
 }
 
 
-export async function eventDetails(event_id: number = 0, fromDate?: string, toDate?: string): Promise<EventDetails> {
+export async function eventDetails(event_id: number = 0, fromDate?: string, toDate?: string): Promise<EventDetails[]> {
 
     let query =  database.from('events as e')
         .join('client as c', 'e.client_id', '=', 'c.id')

@@ -48,7 +48,7 @@ export async function columnInfo(tableName: string) {
             }
         }
         if (columns[i].foreign_key_column) {
-            tekst += "    table.foreign('" + columns[i].name + "').references('" + columns[i].foreign_key_table + "." + columns[i].foreign_key_column + "');\n"
+            tekst += "    .unsigned().references('" + columns[i].foreign_key_table + "." + columns[i].foreign_key_column + "');\n"
         }
     }
     tekst += "})\n"

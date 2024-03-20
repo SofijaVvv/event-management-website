@@ -22,7 +22,7 @@ async function signToken(payload) {
 async function getAdmin(roleId:number){
     const data =  await database('roles').select().where('id',roleId).first();
     if (data){
-        if (data.name === "admin"){
+        if (data.name.toLowerCase() === "admin"){
             return true;
         }
     }
@@ -32,23 +32,42 @@ async function getAdmin(roleId:number){
 
 export async function logIn(podaciOperatera:IUser){
     try {
+        console.log(podaciOperatera, "PODACI OPERATERA")
         const retrievedUser = await database("user")
             .where({ email: podaciOperatera.email })
             .first();
+
         if (!retrievedUser) {
-            return ({ error: true, message: "Invalid username or password!" });
+            return ({ error: true, message: "Invalid username or password - no user!" });
         }
 
         const areSamePasswords = await bcrypt.compare(podaciOperatera.password, retrievedUser.password);
         if (!areSamePasswords) {
-            return ({ error: true, message: "Invalid username or password!" });
+            return ({ error: true, message: "Invalid username or password - passwords dont match!" });
         }
 
-        const privileges = await getPrivilagesRoles(retrievedUser.roles_id);
+
+
+
+
 
         if (retrievedUser.activity == 0){
             return ({ error: true, message: "User is not active!" });
         }
+
+
+
+        // check OTP
+        // const userOTP = podaciOperatera.otp;
+        // const userSecret = retrievedUser.key;
+        // console.log(userOTP, userSecret, "OTP")
+        // const isOTPOk  = await verifyUserOTP(userOTP, userSecret)
+        // if (!isOTPOk) {
+        //     return ({ error: true, message: "Invalid OTP!" });
+        // }
+        //
+
+        const privileges = await getPrivilagesRoles(retrievedUser.roles_id);
 
         let loginPrivileges = [];
         for (let i = 0; i < privileges.length; i++) {
@@ -71,12 +90,15 @@ export async function logIn(podaciOperatera:IUser){
         const payload = { email: retrievedUser.email };
         try {
             const result = await signToken(payload);
+
             const userData = {
                 id: retrievedUser.id,
                 email: retrievedUser.email,
                 name: retrievedUser.name,
-                isadmin: await getAdmin(retrievedUser.roles_id)
+                isadmin: await  getAdmin(retrievedUser.roles_id)
             }
+            console.log("retreived user", retrievedUser, result)
+
             return ({ error: false, token: result, privileges: loginPrivileges, userdata: userData });
         } catch (error) {
             return ({ error: true, message: error.message });
