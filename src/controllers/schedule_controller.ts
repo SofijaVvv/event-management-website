@@ -25,7 +25,7 @@ schedulerouter.get("/schedule/list_events/:event_id/:fromDate/:toDate", authenti
 
 schedulerouter.post("/schedule/add", authenticate, async (request, response) => {
     const scheduleData = request.body;
-    scheduleData.user.id = request.user.id;
+    // scheduleData.user.id = request.user.id;
     await addSchedule(scheduleData).then(rezultat => {
         response.json(rezultat)
     });

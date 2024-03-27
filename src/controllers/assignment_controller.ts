@@ -31,7 +31,7 @@ assignmentrouter.get("/assignments/list_events/:event_id/:fromDate/:toDate", aut
 
 assignmentrouter.post("/assignments/add", authenticate, async (request, response) => {
     const assignmentData = request.body;
-    assignmentData.user.id = request.user.id;
+    // assignmentData.user.id = request.user.id;
     await addAssignment(assignmentData).then(rezultat => {
         response.json(rezultat)
     });

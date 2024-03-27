@@ -26,9 +26,11 @@ async function sendMail(email_to: string, email_subject: string, email_text: str
 
     return transporter.sendMail(mailOptions)
         .then(info => {
+            console.log('info', info);
             return {error: false, message: "Mail sent"};
         })
         .catch(error => {
+            console.log('error', error)
             return {error: true, info: error};
         }).finally(() => {
             transporter.close();

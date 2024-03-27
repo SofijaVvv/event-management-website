@@ -6,13 +6,13 @@
 module.exports = {
 
     development: {
-        client: 'mysql',
+        client: 'mysql2',
         connection: {
             host : 'localhost',
             port : 3306,
-            user : 'root',
-            password : '',
-            database : 'projekat_test'
+            user : 'mujo',
+            password : 'Mujo123!',
+            database : 'test_project'
         }
     },
 
@@ -28,13 +28,13 @@ module.exports = {
     },
 
     production: {
-        client: 'mysql',
+        client: 'mysql2',
         connection: {
-            host : 'localhost',
-            port : 3306,
-            user : 'root',
-            password : '',
-            database : 'projekat'
+            host: 'localhost',
+            port: 3306,
+            user: 'lgproject',
+            password: 'OrloviRanoLete22$',
+            database: 'project'
         }
     }
 

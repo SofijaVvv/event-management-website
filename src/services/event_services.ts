@@ -11,6 +11,7 @@ export async function addEvent(newEvent:EventDetails) {
             id: newEvent.id,
             date: newEvent.date.substring(0, 10),
             time: newEvent.time.name,
+            end_time: newEvent.end_time.name,
             client_id: newEvent.client.id,
             type_of_event_id: newEvent.type_of_event.id,
             status_event_id: newEvent.status_event.id,
@@ -45,9 +46,9 @@ export async function addEvent(newEvent:EventDetails) {
 
 export async function calendar(year: number, month: number, status = 1) {
 
-    const firstDayOfMonth = moment.parseZone(`${year}-${month}-01`);
+    const firstDayOfMonth = moment.parseZone(`${year}-${month}-01`,'YYYY-MM-DD');
 
-    let lastDayOfMonth = moment.parseZone(`${year}-${month}-01`).endOf('month');
+    let lastDayOfMonth = moment.parseZone(`${year}-${month}-01`,'YYYY-MM-DD').endOf('month');
 
     const numDays = lastDayOfMonth.date();
 
@@ -131,6 +132,7 @@ export async function eventDetails(event_id: number = 0, fromDate?: string, toDa
             'e.description',
             'e.date',
             'e.time',
+            'e.end_time',
             'e.event_rating',
             'e.number_of_participants'
             )
@@ -143,6 +145,8 @@ export async function eventDetails(event_id: number = 0, fromDate?: string, toDa
         return query.then(rows => {
             const result: EventDetails[] = [];
             for (let i = 0; i < rows.length; i++) {
+                const start = rows[i].time.replace(':', '');
+                const end = rows[i].end_time.replace(':', '');
                 const event: EventDetails = {
                     id: rows[i].id,
                     client: {
@@ -166,7 +170,8 @@ export async function eventDetails(event_id: number = 0, fromDate?: string, toDa
                         name: rows[i].user_name
                     },
                     description: rows[i].description, date: rows[i].date  .toLocaleDateString('sr-Latn', { day: '2-digit', month: '2-digit', year: 'numeric' }),
-                    time: {id: parseInt(rows[i].time.substring(0, 2)), name: rows[i].time},
+                    time: {id: parseInt(start), name: rows[i].time},
+                    end_time: {id: parseInt(end), name: rows[i].end_time},
                     event_rating: rows[i].event_rating,
                     number_of_participants: rows[i].number_of_participants
                 }

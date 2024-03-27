@@ -50,9 +50,17 @@ export async function getAnalisysData(startDate: string, endDate: string) {
             GROUP BY temp_dates.date_column
     `);
         await database.raw('DROP TEMPORARY TABLE IF EXISTS temp_dates');
-        return {error: false, message: result[0]};
-    } catch (error) {
 
+        const formattedResult = result[0].map((row: any) => {
+            return {
+                date: row.date,
+                total_cost: row.total_cost,
+                total_revenue: row.total_revenue
+            };
+        });
+        return {error: false, message: formattedResult};
+    } catch (error) {
+        console.log("SQL error: ", error)
         return {error: true, message: `Error in executing SQL query ${error}`};
     }
 }

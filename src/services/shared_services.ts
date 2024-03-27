@@ -1,12 +1,19 @@
 import database from "../repository /db";
 import {IUser} from "../interfaces/user";
 import {Details} from "../interfaces/events";
-import {exportAssignmentsExcel, exportCostExcel, exportEventsExcel, exportScheduleExcel} from "./excel_services";
+import {
+    exportAssignmentsExcel,
+    exportClientExcel,
+    exportCostExcel,
+    exportEventsExcel,
+    exportScheduleExcel
+} from "./excel_services";
 import {eventDetails} from "./event_services";
-import {getAssignments} from "./assignment_services";
-import {getSchedules} from "./schedule_services";
+import {getAssignmentList, getAssignments} from "./assignment_services";
+import {getScheduleList, getSchedules} from "./schedule_services";
 import {getCosts} from "./costs_services";
 import {getEventCosts} from "./event_costs_services";
+import {getClient} from "./client_services";
 
 
 export async function getSharedUsers():Promise<IUser[]>{
@@ -15,6 +22,7 @@ export async function getSharedUsers():Promise<IUser[]>{
             'user.id',
             'user.name',
         )
+        .where('user.roles_id', '>', 1)
         .orderBy([{ column : "name",order: "asc"}])
         .then((rows: any) => {
             return (rows);
@@ -172,13 +180,18 @@ export async function eventsToExcel(eventId: number, fromDate: string, toDate: s
 }
 
 export async function assignmentsToExcel(eventId: number, fromDate: string, toDate: string, language: string):Promise<any>{
-    const result = await getAssignments(eventId,fromDate,toDate);
+    const result = await getAssignmentList(eventId,fromDate,toDate);
     return exportAssignmentsExcel(result, language, fromDate, toDate);
 }
 
 export async function scheduleToExcel(eventId: number, fromDate: string, toDate: string, language: string):Promise<any>{
-    const result = await getSchedules(eventId,fromDate,toDate);
+    const result = await getScheduleList(eventId,fromDate,toDate);
     return exportScheduleExcel(result, language, fromDate, toDate);
+}
+
+export async function clientsToExcel(eventId: number):Promise<any>{
+    const result = await getClient(eventId);
+    return exportClientExcel(result);
 }
 
 export async function costToExcel(eventId: number, fromDate: string, toDate: string, language: string):Promise<any>{

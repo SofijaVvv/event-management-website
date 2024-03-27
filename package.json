@@ -21,6 +21,7 @@
     "knex-schema-inspector": "^3.1.0",
     "moment": "^2.30.1",
     "mysql": "^2.18.1",
+    "mysql2": "^3.9.2",
     "nodemailer": "^6.9.12",
     "nodemailer-html-to-text": "^3.2.0",
     "qrcode": "^1.5.3",

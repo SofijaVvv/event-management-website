@@ -129,16 +129,26 @@ export async function exportAssignmentsExcel(data, language = 'en', fromDate:str
 
     worksheet.mergeCells('A1:F1');
     for (let i = 0; i < data.length; i++) {
-        console.log(i);
-        const newRow = worksheet.addRow([
-            data[i].id,
-            data[i].description,
-            data[i].status === 0 ? "Aktivan" : "Zavrsen",
-            data[i].priority.name,
+        if ( data[i].assignments.length === 0) {
+            continue;
+        }
+        const newEventRow = worksheet.addRow([
+            data[i].client.name,
+            '',
+            '',
+            '',
+            '',
             data[i].date,
-            data[i].user.name,
         ]);
-        newRow.eachCell((cell, number) => {
+        newEventRow.eachCell((cell, number) => {
+            cell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: '215C98' }
+            };
+            cell.font = {
+                color: { argb: 'FFFFFF' }
+            }
             cell.border = {
                 top: borderStyle,
                 left: borderStyle,
@@ -146,6 +156,27 @@ export async function exportAssignmentsExcel(data, language = 'en', fromDate:str
                 right: borderStyle
             };
         });
+        worksheet.mergeCells(`A${newEventRow.number}:D${newEventRow.number}`);
+        for (let j = 0; j < data[i].assignments.length; j++)
+        {
+            const newRow = worksheet.addRow([
+                data[i].assignments[j].id,
+                data[i].assignments[j].description,
+                data[i].assignments[j].status === 0 ? "Aktivan" : "Zavrsen",
+                data[i].assignments[j].priority.name,
+                data[i].assignments[j].date,
+                data[i].assignments[j].user.name,
+            ]);
+            newRow.eachCell((cell, number) => {
+                cell.border = {
+                    top: borderStyle,
+                    left: borderStyle,
+                    bottom: borderStyle,
+                    right: borderStyle
+                };
+            });
+        }
+
     }
     return await workbook.xlsx.writeBuffer();
 }
@@ -180,7 +211,7 @@ export async function exportScheduleExcel(data, language = 'en', fromDate:string
     });
 
     let cellSchedule = worksheet.getCell('A1');
-    cellSchedule.value = `Pregled dogadjaja ${fromDate} do ${toDate}`;
+    cellSchedule.value = `Pregled rasporeda ${fromDate} do ${toDate}`;
     cellSchedule.font = { bold: true };
     cellSchedule.alignment = { vertical: 'middle', horizontal: 'center' };
     cellSchedule.fill = {
@@ -197,14 +228,25 @@ export async function exportScheduleExcel(data, language = 'en', fromDate:string
 
     worksheet.mergeCells('A1:D1');
     for (let i = 0; i < data.length; i++) {
-        console.log(i);
-        const newRow = worksheet.addRow([
-            data[i].id,
-            data[i].description,
-            data[i].start_time.name,
-            data[i].end_time.name
+        console.log(data)
+        if ( data[i].schedules.length === 0) {
+            continue;
+        }
+        const newEventRow = worksheet.addRow([
+            data[i].client.name,
+            '',
+            '',
+            data[i].date,
         ]);
-        newRow.eachCell((cell, number) => {
+        newEventRow.eachCell((cell, number) => {
+            cell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: '215C98' }
+            };
+            cell.font = {
+                color: { argb: 'FFFFFF' }
+            }
             cell.border = {
                 top: borderStyle,
                 left: borderStyle,
@@ -212,6 +254,23 @@ export async function exportScheduleExcel(data, language = 'en', fromDate:string
                 right: borderStyle
             };
         });
+        worksheet.mergeCells(`A${newEventRow.number}:C${newEventRow.number}`);
+        for (let j = 0; j < data[i].schedules.length; j++) {
+            const newRow = worksheet.addRow([
+                data[i].schedules[j].id,
+                data[i].schedules[j].description,
+                data[i].schedules[j].start_time.name,
+                data[i].schedules[j].end_time.name
+            ]);
+            newRow.eachCell((cell, number) => {
+                cell.border = {
+                    top: borderStyle,
+                    left: borderStyle,
+                    bottom: borderStyle,
+                    right: borderStyle
+                };
+            });
+        }
     }
  return await workbook.xlsx.writeBuffer();
 }
@@ -309,4 +368,83 @@ export async function exportAnalisysExcel(){
     cell = worksheet.getCell('B10');
     cell.value = 1100
     await workbook.xlsx.writeFile(filePath);
+}
+
+
+export async function exportClientExcel(data) {
+    console.log(data);
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Izvjestaj");
+    let borderStyle: Partial<Border> = { style: 'thin', color: { argb: '00000000' } };
+
+    worksheet.addRow([`Lista komitenata`])
+    worksheet.columns = [
+        { header: "ID", key: "id", width: 10 },
+        { header: "Ime komitenta", key: "ime", width: 30 },
+        { header: "Adresa", key: "adresa", width: 12},
+        { header: "Grad", key: "grad", width: 15 },
+        { header: "Email", key: "email", width: 15 },
+        { header: "Telefon", key: "telefon", width: 15 },
+        { header: "Pib", key: "pib", width: 15 },
+        { header: "Pdv broj", key: "pdv", width: 15 },
+        { header: "Bankovni račun", key: "bankovni_racun", width: 15 },
+        { header: "Tip komitenta", key: "tip_komitenta", width: 15 }
+    ]
+
+    let headerSchedule = worksheet.addRow(worksheet.columns.map(column => column.header));
+    headerSchedule.eachCell((cell, number) => {
+        cell.border = {
+            top: borderStyle,
+            left: borderStyle,
+            bottom: borderStyle,
+            right: borderStyle
+        };
+        cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'e1e1e1' }
+        }
+    });
+
+    let cellSchedule = worksheet.getCell('A1');
+    cellSchedule.value = `Lista komitenata`;
+    cellSchedule.font = { bold: true };
+    cellSchedule.alignment = { vertical: 'middle', horizontal: 'center' };
+    cellSchedule.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'f1f1f1' }
+    }
+    cellSchedule.border = {
+        top: borderStyle,
+        left: borderStyle,
+        bottom: borderStyle,
+        right: borderStyle
+    };
+
+    worksheet.mergeCells('A1:J1');
+    for (let i = 0; i < data.length; i++) {
+        const newRow = worksheet.addRow([
+            data[i].id,
+            data[i].name,
+            data[i].address,
+            data[i].city,
+            data[i].email,
+            data[i].phone,
+            data[i].pib,
+            data[i].pdvnumber,
+            data[i].bank_account,
+            data[i].type_of_client.name,
+
+        ]);
+        newRow.eachCell((cell, number) => {
+            cell.border = {
+                top: borderStyle,
+                left: borderStyle,
+                bottom: borderStyle,
+                right: borderStyle
+            };
+        });
+    }
+    return await workbook.xlsx.writeBuffer();
 }
